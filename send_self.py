@@ -11,33 +11,33 @@ import sublime_plugin
 import sublime
 
 
-class GeneratorWrapper():
-    """TODOC
+class GeneratorWrapperBase(object):
 
-    An instance of this will be sent to the generator function. `send`
-    holds a wrapper function that calls either next(gen) or gen.send(val).
+    """TODOC
     """
 
-    # Save some overhead here. Not exactly needed but you shouldn't mess with
-    # instances of this class, only use or call.
-    __slots__ = ('generator', 'generator_ref', 'catch_stopiteration')
-
-    def __init__(self, generator, generator_ref, catch_stopiteration=True):
-        self.generator = generator
-        self.generator_ref = generator_ref
+    def __init__(self, catch_stopiteration=True):
+        print("new Wrapper created", self)
         self.catch_stopiteration = catch_stopiteration
 
     def __del__(self):
         print("Wrapper is being deleted", self)
 
-    def _get_generator(self):
-        return self.generator or self.generator_ref()
+    generator = NotImplemented
+
+    weak_generator = NotImplemented
+
+    def with_strong_ref(self):
+        return NotImplemented
+
+    def with_weak_ref(self):
+        return NotImplemented
 
     @property
     def send(self):
-        return partial(self._send, self._get_generator())
+        return partial(self._send, self.generator)
 
-    # a wrapper around send with a default value
+    # A wrapper around send with a default value
     def _send(self, generator, value=None):
         print("send:", generator, value)
         if self.catch_stopiteration:
@@ -50,7 +50,7 @@ class GeneratorWrapper():
 
     @property
     def throw(self):
-        return partial(self._throw, self._get_generator())
+        return partial(self._throw, self.generator)
 
     def _throw(self, generator, *args, **kwargs):
         print("throw:", generator, args, kwargs)
@@ -64,16 +64,43 @@ class GeneratorWrapper():
 
     @property
     def close(self):
-        return self._get_generator().close
+        return self.generator.close
+
+
+class WeakGeneratorWrapper(GeneratorWrapperBase):
+    def __init__(self, generator, catch_stopiteration):
+        self.weak_generator = weakref.ref(generator)
+        super(WeakGeneratorWrapper, self).__init__(catch_stopiteration)
+
+    @property
+    def generator(self):
+        return self.weak_generator()
 
     def with_strong_ref(self):
-        if self.generator:
-            return self
-        else:
-            return self.__class__(self._get_generator(), None,
-                                  self.catch_stopiteration)
+        return StrongGeneratorWrapper(self.generator, self.catch_stopiteration)
+
+    def with_weak_ref(self):
+        return self
 
     __call__ = with_strong_ref
+
+
+class StrongGeneratorWrapper(GeneratorWrapperBase):
+    def __init__(self, generator, catch_stopiteration):
+        self.generator = generator
+        super(StrongGeneratorWrapper, self).__init__(catch_stopiteration)
+
+    @property
+    def weak_generator(self):
+        return weakref.ref(self.generator)
+
+    def with_strong_ref(self):
+        return self
+
+    def with_weak_ref(self):
+        return WeakGeneratorWrapper(self.generator, self.catch_stopiteration)
+
+    __call__ = with_strong_ref  # Always return strong-referenced variant
 
 
 def monitor_refcounts(ref):
@@ -100,49 +127,47 @@ def monitor_refcounts(ref):
     sublime.status_message("Object was garbage collected")
 
 
-def send_self(use_weakref=True, catch_stopiteration=True):
+def send_self(catch_stopiteration=True, finalize_callback=None):
     """Decorator that sends a generator a wrapper of itself.
 
-    The returned function instantiates and sends a generator a wrapper of itself
-    via the first 'yield' used. The wrapper is an instance of GeneratorWrapper.
+    When a generator decorated by this is called, it gets sent a wrapper of
+    itself via the first 'yield' used. The wrapper is an instance of
+    WeakGeneratorWrapper.
 
     Useful for creating generators that can leverage callback-based functions in
     a linear style, by passing the wrapper as callback in the first yield
     statement.
 
-    The generator wrapper wraps a weak reference (weakref.ref) by default. To
-    override this set use_weakref to `False`, though you potentially need to
-    clean up the generator yourself afterwards in case it is not resumed because
-    it won't be garbage collected.
-
     The wrapper catches StopIteration exceptions by default. If you wish to have
-    them propagated, set catch_stopiteration to `False`.
+    them propagated, set catch_stopiteration to `False`. Forwarded to the
+    Wrapper.
     """
-    # "use_weakref" needs to be the name of the first parameter. For clarity, we
-    # mirror that to first_param and override use_weakref later.
-    first_param = use_weakref
-    use_weakref = True
+    # "catch_stopiteration" needs to be the name of the first parameter. For
+    # clarity, we mirror that to first_param and override catch_stopiteration
+    # later.
+    first_param = catch_stopiteration
+    catch_stopiteration = True
 
     # We either directly call this, or return it to be called by Python's
     # decorator mechanism.
     def _send_self(func):
         @wraps(func)
         def send_self_wrapper(*args, **kwargs):
-            nonlocal use_weakref, catch_stopiteration  # optional but for clarity
+            # optional but for clarity
+            nonlocal catch_stopiteration, finalize_callback
 
             # Create generator
             generator = func(*args, **kwargs)
 
-            # "initial call to the generator" (=> this wrapper).
-            # The first yielded value will be used as return value of the
-            weak_generator = weakref.ref(generator, lambda r: print("finalized"))
+            weak_generator = weakref.ref(generator, finalize_callback)
             threading.Thread(target=monitor_refcounts,
                              args=[weak_generator]).start()
 
-            ret_value = next(generator)  # Start the generator
+            # The first yielded value will be used as return value of the
+            # "initial call to the generator" (=> this wrapper).
+            ret_value = next(generator)  # Start generator
 
-            gen_wrapper = GeneratorWrapper(None, weak_generator,
-                                           catch_stopiteration)
+            gen_wrapper = WeakGeneratorWrapper(generator, catch_stopiteration)
             # Send generator wrapper to the generator.
             generator.send(gen_wrapper)
 
@@ -158,8 +183,11 @@ def send_self(use_weakref=True, catch_stopiteration=True):
     else:
         # Someone has called @send_self(...) with parameters and thus we need to
         # return _send_self to be called indirectly.
-        use_weakref = first_param
+        catch_stopiteration = first_param
         return _send_self
+
+
+################################################################################
 
 
 def defer(callback, call=True):
@@ -169,7 +197,7 @@ def defer(callback, call=True):
         if call:
             callback()
         else:
-            print("generator will be deleted (if weakref'd)")
+            print("generator was not re-called")
 
     threading.Thread(target=func).start()
 
@@ -196,14 +224,30 @@ def sub_generator(this):
     try:
         yield test_throw(this(), 300)
     except TypeError as e:
-        print("We wanted to pass 300", e)
+        print("We passed 300, but", e)
         yield "yeah, that was unreasonable"
 
 
 class TestCommandCommand(sublime_plugin.WindowCommand):
-    @send_self
+
+    def wont_be_finished(self):
+        this = yield
+
+        print("wont_be_finished")
+        yield defer(this.send)  # this is where the initial caller will be resumed
+        print("middle~")
+        yield defer(this.send, False)
+        print("this should not be printed")
+
+    @send_self(finalize_callback=lambda x: print("finalized"))
     def run(self):
         this = yield
+
+        print("original weak-ref variant:", this)
+        this = this()
+        print("strong-ref variant:", this)
+        this = this.with_weak_ref()
+        print("new weak-ref variant:", this)
 
         yield defer(this.send)
         print("one")
@@ -222,11 +266,21 @@ class TestCommandCommand(sublime_plugin.WindowCommand):
         print("two")
 
         # Utilize a sub-generator and pass the wrapper as argument so that it
-        # can have data sent to itself.
+        # can have data sent to itself (even exceptions).
         yield from sub_generator(this)
+
+        # Different method to invoke a sub-generator (and less effective)
+        wont_be_finished = send_self(finalize_callback=this.send)(self.wont_be_finished)
+
+        print("launching weird sub-generator")
+        old_obj = yield wont_be_finished()
+        print("weakref of other sub-generator:", old_obj)
 
         # text = yield self.window.show_input_panel("Enter stuff", '', this.send,
         #                                           None, None)
         # print(text)
-        yield defer(this.send, False)
-        print("this should not be printed")
+
+        # Now, make reference strong and cause cyclic reference
+        # DON'T TRY THIS AT HOME! MEMORY LEAK!
+        # this = this()
+        # yield
