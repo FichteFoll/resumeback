@@ -63,8 +63,9 @@ class WeakGeneratorWrapper(object):
             # send_self parameter. Same for ._throw.
             try:
                 return generator.send(value)
-            except StopIteration:
-                return None
+            except StopIteration as si:
+                print(si)
+                return getattr(si, 'value', None)
         else:
             generator.send(value)
 
@@ -78,8 +79,8 @@ class WeakGeneratorWrapper(object):
         if self.catch_stopiteration:
             try:
                 return generator.throw(*args, **kwargs)
-            except StopIteration:
-                return None
+            except StopIteration as si:
+                return getattr(si, 'value', None)
         else:
             generator.throw(*args, **kwargs)
 
@@ -254,6 +255,15 @@ def sub_generator(this):
         yield "yeah, that was unreasonable"
 
 
+def the_last_yield(cb):
+    def func():
+        time.sleep(0.2)
+        val = cb(10)
+        print("returned value", val)
+
+    threading.Thread(target=func).start()
+
+
 class TestCommandCommand(sublime_plugin.WindowCommand):
 
     def wont_be_finished(self):
@@ -313,14 +323,17 @@ class TestCommandCommand(sublime_plugin.WindowCommand):
         old_obj = yield wont_be_finished()
         print("weakref of other sub-generator:", old_obj)
 
-        # text = yield self.window.show_input_panel("Enter stuff", '', this.send,
-        #                                           None, None)
-        # print(text)
-
-        # Now, make reference strong and cause cyclic reference
+        # This creates a strong reference and causes cyclic reference.
         # DON'T TRY THIS AT HOME! MEMORY LEAK!
         # this = this()
         # yield
+
+        x = yield the_last_yield(this.send)
+
+        # return a value (will be the_last_yield's return
+        # value of calling `this.send`).
+        # This is a Python 3.3 feature.
+        return x * 12
 
 
 class Test2CommandCommand(sublime_plugin.WindowCommand):
