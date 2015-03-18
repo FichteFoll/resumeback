@@ -41,6 +41,15 @@ class WeakGeneratorWrapper(object):
         return self
 
     @property
+    def next(self):
+        return partial(self._next, self.generator)
+
+    __next__ = next  # Python 3
+
+    def _next(self, generator):
+        return self._send(generator)
+
+    @property
     def send(self):
         return partial(self._send, self.generator)
 
@@ -226,7 +235,7 @@ def test_throw(gw, i):
         if i >= 3:
             ret = gw.throw(TypeError, "%d is greater than 2" % i)
             print("catched and returned:", ret)  # should be the above message
-            gw.send()  # resume
+            next(gw)  # resume
         else:
             gw.send(i * 10)
 
