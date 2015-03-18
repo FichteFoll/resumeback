@@ -13,10 +13,60 @@ import sublime
 
 class WeakGeneratorWrapper(object):
 
-    """TODOC
+    """Wraps a weak reference to a generator and adds convenience features.
+
+    Generally behaves like a normal generator
+    in terms of the four methods
+    'send', 'throw', 'close' and 'next'/'__next__',
+    but has the following convenience features:
+
+    1. Method access will create a strong reference
+       to the generator so that you can
+       pass them as callback arguments
+       from within the generator
+       without causing it to get garbage-collected.
+       Usually the reference count decreases (possibly to 0)
+       when the generator pauses.
+
+    2. The `send` method has a default value
+       for its `value` parameter.
+       This allows it to be used without a parameter
+       when it will behave like `next(generator)`,
+       unlike the default implementation of send.
+
+    3. The methods :meth:`send` and :meth:`throw`
+       optionally catch ``StopIteration`` exceptions
+       so that they are not propagated to the caller
+       when the generator terminates.
+
+    4. :meth:`with_strong_ref` (= ``__call__``) will return a wrapper
+       with a strong reference to the generator.
+       This allows you to pass
+       the entire wrapper by itself as a "callback"
+       and the delegated function may choose
+       between normally sending a value
+       or throwing an exception
+       where the generator was paused.
     """
 
     def __init__(self, weak_generator, catch_stopiteration=True, debug=False):
+        """__init__
+
+        :type weak_generator: weakref.ref
+        :param weak_generator: Weak reference to a generator.
+
+        :type catch_stopiteration: bool
+        :param catch_stopiteration:
+            Set to `False`
+            to not catch StopIteration exceptions
+            raised by methods that communicate with a generate,
+            i.e. next, __next__, send and throw.
+
+        :type debug: bool
+        :param debug:
+            Set to `True`
+            to get some debug information in `sys.stdout`.
+        """
         self.weak_generator = weak_generator
         self.catch_stopiteration = catch_stopiteration
         self.debug = debug
@@ -32,16 +82,20 @@ class WeakGeneratorWrapper(object):
 
     @property
     def generator(self):
+        """The actual generator object, weak-reference unmasked."""
         return self.weak_generator()
 
     def with_strong_ref(self):
+        """Get a StrongGeneratorWrapper with the same settings."""
         return StrongGeneratorWrapper(self.generator, *self._args)
 
     def with_weak_ref(self):
+        """Get a WeakGeneratorWrapper with the same settings."""
         return self
 
     @property
     def next(self):
+        """TODOC"""
         return partial(self._next, self.generator)
 
     __next__ = next  # Python 3
@@ -51,16 +105,18 @@ class WeakGeneratorWrapper(object):
 
     @property
     def send(self):
+        """TODOC"""
         return partial(self._send, self.generator)
+
+    # TODO Methods that wait until generator is suspended.
+    # Check if generator.gi_running works as expected and if it exists
+    # in Py2, or catch `ValueError: generator already executing`.
 
     # A wrapper around send with a default value
     def _send(self, generator, value=None):
         if self.debug:
             print("send:", generator, value)
         if self.catch_stopiteration:
-            # TODO maybe catch `ValueError: generator already executing` and try
-            # to resend until it is paused? Could lead to lockups and would be a
-            # send_self parameter. Same for ._throw.
             try:
                 return generator.send(value)
             except StopIteration as si:
@@ -71,6 +127,7 @@ class WeakGeneratorWrapper(object):
 
     @property
     def throw(self):
+        """TODOC"""
         return partial(self._throw, self.generator)
 
     def _throw(self, generator, *args, **kwargs):
@@ -86,6 +143,7 @@ class WeakGeneratorWrapper(object):
 
     @property
     def close(self):
+        """Equivalent to `self.generator.close`."""
         return self.generator.close
 
     __call__ = with_strong_ref
@@ -93,9 +151,36 @@ class WeakGeneratorWrapper(object):
 
 class StrongGeneratorWrapper(WeakGeneratorWrapper):
 
+    """Wraps a generator and adds convenience features.
+
+    Generally operates similar to :class:`WeakGeneratorWrapper`,
+    except that it holds a string reference to the generator.
+    You will want to pass an instance of this class around
+    while the generator is paused
+    so that it is not garbage-collected.
+
+    IMPORTANT:
+    DO NOT BIND AN INSTANCE OF THIS
+    IN THE GENERATOR'S LOCAL SCOPE ITSELF
+    (unless you know what you are doing).
+    Otherwise the generator will not be garbage-collected
+    if it is paused due to a yield
+    and not called again.
+    """
+
     generator = None  # Override property of WeakGeneratorWrapper
 
     def __init__(self, generator, weak_generator=None, *args, **kwargs):
+        """__init__
+
+        :type generator: generator
+        :param generator: The generator object.
+
+        :type weak_generator: weakref.ref
+        :param weak_generator: Weak reference to a generator. Optional.
+
+        For other parameters see :meth:`WeakGeneratorWrapper.__init__`.
+        """
         # It's important that the weak_generator object reference is preserved
         # because it will hold the `finalize_callback` callback from @send_self.
         self.generator = generator
@@ -106,9 +191,11 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
                                                      **kwargs)
 
     def with_strong_ref(self):
+        """Get a StrongGeneratorWrapper with the same settings."""
         return self
 
     def with_weak_ref(self):
+        """Get a WeakGeneratorWrapper with the same settings."""
         return WeakGeneratorWrapper(*self._args)
 
     __call__ = with_strong_ref
@@ -117,17 +204,58 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
 def send_self(catch_stopiteration=True, finalize_callback=None, debug=False):
     """Decorator that sends a generator a wrapper of itself.
 
-    When a generator decorated by this is called, it gets sent a wrapper of
-    itself via the first 'yield' used. The wrapper is an instance of
-    WeakGeneratorWrapper.
+    Can be called with parameters or used as a decorator directly.
 
-    Useful for creating generators that can leverage callback-based functions in
-    a linear style, by passing the wrapper as callback in the first yield
-    statement.
+    When a generator decorated by this is called,
+    it gets sent a wrapper of itself
+    via the first 'yield' used.
+    The wrapper is an instance of :class:`WeakGeneratorWrapper`.
+    The function then returns the first yielded value
+    while the generator runs as a co-routine.
 
-    The wrapper catches StopIteration exceptions by default. If you wish to have
-    them propagated, set catch_stopiteration to `False`. Forwarded to the
-    Wrapper.
+    Useful for creating generators
+    that can leverage callback-based functions
+    in a linear style,
+    by passing the wrapper or one of its method properties
+    as callback parameters
+    and then pausing itself with 'yield'.
+
+    IMPORTANT:
+    DO NOT BIND STRONG REFERENCES TO THE GENERATOR
+    IN THE GENERATOR'S LOCAL SCOPE ITSELF
+    (unless you know what you are doing).
+    Otherwise the generator will not be garbage-collected
+    if it is paused due to a yield
+    and not called again.
+
+    See :class:`WeakGeneratorWrapper` for what you can do with it.
+
+    :type catch_stopiteration: bool
+    :param catch_stopiteration:
+        The wrapper catches ``StopIteration`` exceptions by default.
+        If you wish to have them propagated,
+        set this to ``False``.
+        Forwarded to the Wrapper.
+
+    :type finalize_callback: callable
+    :param finalize_callback:
+        When the generator is garabage-collected and finalized,
+        this callback will be called.
+        It will recieve the weak-referenced object
+        to the dead referent as first parameter,
+        as specified by `weakref.ref`.
+
+    :type debug: bool
+    :param debug:
+        Set this to ``True``
+        if you wish to have some debug output
+        printed to sys.stdout.
+        Probably useful if you are debugging problems
+        with the generator not being resumed or finalized.
+        Forwarded to the Wrapper.
+
+    :return:
+        The first yielded value of the generator.
     """
     # "catch_stopiteration" needs to be the name of the first parameter. For
     # clarity, we mirror that to first_param and override catch_stopiteration
