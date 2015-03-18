@@ -11,14 +11,17 @@ import sublime_plugin
 import sublime
 
 
-class GeneratorWrapperBase(object):
+class WeakGeneratorWrapper(object):
 
     """TODOC
     """
 
-    def __init__(self, catch_stopiteration=True, debug=False):
+    def __init__(self, weak_generator, catch_stopiteration=True, debug=False):
+        self.weak_generator = weak_generator
         self.catch_stopiteration = catch_stopiteration
         self.debug = debug
+
+        self._args = (weak_generator, catch_stopiteration, debug)
 
         if self.debug:
             print("new Wrapper created", self)
@@ -27,15 +30,15 @@ class GeneratorWrapperBase(object):
         if self.debug:
             print("Wrapper is being deleted", self)
 
-    generator = NotImplemented
-
-    weak_generator = NotImplemented
+    @property
+    def generator(self):
+        return self.weak_generator()
 
     def with_strong_ref(self):
-        return NotImplemented
+        return StrongGeneratorWrapper(self.generator, *self._args)
 
     def with_weak_ref(self):
-        return NotImplemented
+        return self
 
     @property
     def send(self):
@@ -75,45 +78,30 @@ class GeneratorWrapperBase(object):
     def close(self):
         return self.generator.close
 
-
-class WeakGeneratorWrapper(GeneratorWrapperBase):
-
-    def __init__(self, generator, *args, **kwargs):
-        self.weak_generator = weakref.ref(generator)
-        super(WeakGeneratorWrapper, self).__init__(*args, **kwargs)
-
-    @property
-    def generator(self):
-        return self.weak_generator()
-
-    def with_strong_ref(self):
-        return StrongGeneratorWrapper(self.generator, self.catch_stopiteration,
-                                      self.debug)
-
-    def with_weak_ref(self):
-        return self
-
     __call__ = with_strong_ref
 
 
-class StrongGeneratorWrapper(GeneratorWrapperBase):
+class StrongGeneratorWrapper(WeakGeneratorWrapper):
 
-    def __init__(self, generator, *args, **kwargs):
+    generator = None  # Override property of WeakGeneratorWrapper
+
+    def __init__(self, generator, weak_generator=None, *args, **kwargs):
+        # It's important that the weak_generator object reference is preserved
+        # because it will hold the `finalize_callback` callback from @send_self.
         self.generator = generator
-        super(StrongGeneratorWrapper, self).__init__(*args, **kwargs)
 
-    @property
-    def weak_generator(self):
-        return weakref.ref(self.generator)
+        if weak_generator is None:
+            weak_generator = weakref.ref(generator)
+        super(StrongGeneratorWrapper, self).__init__(weak_generator, *args,
+                                                     **kwargs)
 
     def with_strong_ref(self):
         return self
 
     def with_weak_ref(self):
-        return WeakGeneratorWrapper(self.generator, self.catch_stopiteration,
-                                    self.debug)
+        return WeakGeneratorWrapper(*self._args)
 
-    __call__ = with_strong_ref  # Always return strong-referenced variant
+    __call__ = with_strong_ref
 
 
 def send_self(catch_stopiteration=True, finalize_callback=None, debug=False):
@@ -149,15 +137,18 @@ def send_self(catch_stopiteration=True, finalize_callback=None, debug=False):
             generator = func(*args, **kwargs)
 
             # Register finalize_callback to be called when the object is gc'ed
-            weakref.ref(generator, finalize_callback)
+            weak_generator = weakref.ref(generator, finalize_callback)
 
             # The first yielded value will be used as return value of the
             # "initial call to the generator" (=> this wrapper).
             ret_value = next(generator)  # Start generator
 
             # Send wrapper to the generator
-            gen_wrapper = WeakGeneratorWrapper(generator, catch_stopiteration,
-                                               debug)
+            gen_wrapper = WeakGeneratorWrapper(
+                weak_generator,
+                catch_stopiteration,
+                debug
+            )
             generator.send(gen_wrapper)
 
             return ret_value
