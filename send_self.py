@@ -207,14 +207,12 @@ def monitor_refcounts(ref):
 
         msg = ("weak refcount: %d - strong refcount: %d"
                % (newweak, newstrong))
-        sublime.status_message(msg)
 
         if (newweak, newstrong) != (oldweak, oldstrong):
             oldweak, oldstrong = newweak, newstrong
             print(msg)
 
     print("Object was garbage collected", ref)
-    sublime.status_message("Object was garbage collected")
 
 
 def defer(callback, call=True):
@@ -279,7 +277,8 @@ class TestCommandCommand(sublime_plugin.WindowCommand):
         yield defer(this.send, False)
         print("this should not be printed")
 
-    @send_self(finalize_callback=lambda x: print("finalized"), debug=DEBUG)
+    @send_self(finalize_callback=lambda x: print("generator finalized"),
+               debug=DEBUG)
     def run(self):
         this = yield
         if this.debug:
