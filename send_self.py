@@ -16,12 +16,16 @@ class GeneratorWrapperBase(object):
     """TODOC
     """
 
-    def __init__(self, catch_stopiteration=True):
-        print("new Wrapper created", self)
+    def __init__(self, catch_stopiteration=True, debug=False):
         self.catch_stopiteration = catch_stopiteration
+        self.debug = debug
+
+        if self.debug:
+            print("new Wrapper created", self)
 
     def __del__(self):
-        print("Wrapper is being deleted", self)
+        if self.debug:
+            print("Wrapper is being deleted", self)
 
     generator = NotImplemented
 
@@ -39,8 +43,12 @@ class GeneratorWrapperBase(object):
 
     # A wrapper around send with a default value
     def _send(self, generator, value=None):
-        print("send:", generator, value)
+        if self.debug:
+            print("send:", generator, value)
         if self.catch_stopiteration:
+            # TODO maybe catch `ValueError: generator already executing` and try
+            # to resend until it is paused? Could lead to lockups and would be a
+            # send_self parameter. Same for ._throw.
             try:
                 return generator.send(value)
             except StopIteration:
@@ -53,7 +61,8 @@ class GeneratorWrapperBase(object):
         return partial(self._throw, self.generator)
 
     def _throw(self, generator, *args, **kwargs):
-        print("throw:", generator, args, kwargs)
+        if self.debug:
+            print("throw:", generator, args, kwargs)
         if self.catch_stopiteration:
             try:
                 return generator.throw(*args, **kwargs)
@@ -68,16 +77,18 @@ class GeneratorWrapperBase(object):
 
 
 class WeakGeneratorWrapper(GeneratorWrapperBase):
-    def __init__(self, generator, catch_stopiteration):
+
+    def __init__(self, generator, *args, **kwargs):
         self.weak_generator = weakref.ref(generator)
-        super(WeakGeneratorWrapper, self).__init__(catch_stopiteration)
+        super(WeakGeneratorWrapper, self).__init__(*args, **kwargs)
 
     @property
     def generator(self):
         return self.weak_generator()
 
     def with_strong_ref(self):
-        return StrongGeneratorWrapper(self.generator, self.catch_stopiteration)
+        return StrongGeneratorWrapper(self.generator, self.catch_stopiteration,
+                                      self.debug)
 
     def with_weak_ref(self):
         return self
@@ -86,9 +97,10 @@ class WeakGeneratorWrapper(GeneratorWrapperBase):
 
 
 class StrongGeneratorWrapper(GeneratorWrapperBase):
-    def __init__(self, generator, catch_stopiteration):
+
+    def __init__(self, generator, *args, **kwargs):
         self.generator = generator
-        super(StrongGeneratorWrapper, self).__init__(catch_stopiteration)
+        super(StrongGeneratorWrapper, self).__init__(*args, **kwargs)
 
     @property
     def weak_generator(self):
@@ -98,36 +110,13 @@ class StrongGeneratorWrapper(GeneratorWrapperBase):
         return self
 
     def with_weak_ref(self):
-        return WeakGeneratorWrapper(self.generator, self.catch_stopiteration)
+        return WeakGeneratorWrapper(self.generator, self.catch_stopiteration,
+                                    self.debug)
 
     __call__ = with_strong_ref  # Always return strong-referenced variant
 
 
-def monitor_refcounts(ref):
-    oldweak, oldstrong = 0, 0
-    print("start minitoring", ref())
-    while True:
-        time.sleep(0.05)
-
-        obj = ref()
-        if not obj:
-            break
-        newweak, newstrong = weakref.getweakrefcount(ref), sys.getrefcount(obj)
-        del obj
-
-        msg = ("weak refcount: %d - strong refcount: %d"
-               % (newweak, newstrong))
-        sublime.status_message(msg)
-
-        if (newweak, newstrong) != (oldweak, oldstrong):
-            oldweak, oldstrong = newweak, newstrong
-            print(msg)
-
-    print("Object was garbage collected")
-    sublime.status_message("Object was garbage collected")
-
-
-def send_self(catch_stopiteration=True, finalize_callback=None):
+def send_self(catch_stopiteration=True, finalize_callback=None, debug=False):
     """Decorator that sends a generator a wrapper of itself.
 
     When a generator decorated by this is called, it gets sent a wrapper of
@@ -154,21 +143,21 @@ def send_self(catch_stopiteration=True, finalize_callback=None):
         @wraps(func)
         def send_self_wrapper(*args, **kwargs):
             # optional but for clarity
-            nonlocal catch_stopiteration, finalize_callback
+            nonlocal catch_stopiteration, finalize_callback, debug
 
             # Create generator
             generator = func(*args, **kwargs)
 
-            weak_generator = weakref.ref(generator, finalize_callback)
-            threading.Thread(target=monitor_refcounts,
-                             args=[weak_generator]).start()
+            # Register finalize_callback to be called when the object is gc'ed
+            weakref.ref(generator, finalize_callback)
 
             # The first yielded value will be used as return value of the
             # "initial call to the generator" (=> this wrapper).
             ret_value = next(generator)  # Start generator
 
-            gen_wrapper = WeakGeneratorWrapper(generator, catch_stopiteration)
-            # Send generator wrapper to the generator.
+            # Send wrapper to the generator
+            gen_wrapper = WeakGeneratorWrapper(generator, catch_stopiteration,
+                                               debug)
             generator.send(gen_wrapper)
 
             return ret_value
@@ -188,6 +177,43 @@ def send_self(catch_stopiteration=True, finalize_callback=None):
 
 
 ################################################################################
+################################################################################
+################################################################################
+
+
+# Set to true for very detailed debug printing (forwarded to @send_self
+# decorator).
+DEBUG = True
+
+
+# Following are a few funtions that are utilized to:
+# 1. Print detailed debug information about the objects used and their
+#    references.
+# 2. Show case a few uses of generators as co-routines, such as throwing an
+#    exception.
+
+def monitor_refcounts(ref):
+    oldweak, oldstrong = 0, 0
+    print("start minitoring with", ref)
+    while True:
+        time.sleep(0.05)
+
+        obj = ref()
+        if not obj:
+            break
+        newweak, newstrong = weakref.getweakrefcount(ref), sys.getrefcount(obj)
+        del obj
+
+        msg = ("weak refcount: %d - strong refcount: %d"
+               % (newweak, newstrong))
+        sublime.status_message(msg)
+
+        if (newweak, newstrong) != (oldweak, oldstrong):
+            oldweak, oldstrong = newweak, newstrong
+            print(msg)
+
+    print("Object was garbage collected", ref)
+    sublime.status_message("Object was garbage collected")
 
 
 def defer(callback, call=True):
@@ -197,7 +223,7 @@ def defer(callback, call=True):
         if call:
             callback()
         else:
-            print("generator was not re-called")
+            print("generator is not re-called")
 
     threading.Thread(target=func).start()
 
@@ -232,16 +258,23 @@ class TestCommandCommand(sublime_plugin.WindowCommand):
 
     def wont_be_finished(self):
         this = yield
+        if this.debug:
+            threading.Thread(target=monitor_refcounts,
+                             args=[this.weak_generator]).start()
 
         print("wont_be_finished")
-        yield defer(this.send)  # this is where the initial caller will be resumed
+        # this is where the initial caller will be resumed
+        yield defer(this.send)
         print("middle~")
         yield defer(this.send, False)
         print("this should not be printed")
 
-    @send_self(finalize_callback=lambda x: print("finalized"))
+    @send_self(finalize_callback=lambda x: print("finalized"), debug=DEBUG)
     def run(self):
         this = yield
+        if this.debug:
+            threading.Thread(target=monitor_refcounts,
+                             args=[this.weak_generator]).start()
 
         print("original weak-ref variant:", this)
         this = this()
@@ -267,10 +300,14 @@ class TestCommandCommand(sublime_plugin.WindowCommand):
 
         # Utilize a sub-generator and pass the wrapper as argument so that it
         # can have data sent to itself (even exceptions).
+        # Only for Python 3.3! (new syntax)
         yield from sub_generator(this)
 
         # Different method to invoke a sub-generator (and less effective)
-        wont_be_finished = send_self(finalize_callback=this.send)(self.wont_be_finished)
+        wont_be_finished = send_self(
+            finalize_callback=this.send,
+            debug=this.debug
+        )(self.wont_be_finished)
 
         print("launching weird sub-generator")
         old_obj = yield wont_be_finished()
@@ -284,3 +321,28 @@ class TestCommandCommand(sublime_plugin.WindowCommand):
         # DON'T TRY THIS AT HOME! MEMORY LEAK!
         # this = this()
         # yield
+
+
+class Test2CommandCommand(sublime_plugin.WindowCommand):
+    # This is a sub-generator
+    def prompt(self, this, caption):
+        return (yield self.window.show_input_panel(caption, '', this.send,
+                                                   None, None))
+
+    @send_self(finalize_callback=lambda x: print("finalized"))
+    def run(self):
+        this = yield  # This should be the first line
+
+        text = yield self.window.show_input_panel("Enter something", '',
+                                                  this.send, None, None)
+        print("Entered the following text:", text)
+
+        more_text = [(yield from self.prompt(this,
+                                             "Please enter some more text " + i)
+                      ) for i in range(4)]
+
+        selection = yield self.window.show_quick_panel(more_text, this.send)
+        if selection == -1:
+            print("No selection made")
+        else:
+            print("Selected:", more_text[selection])
