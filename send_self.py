@@ -47,6 +47,25 @@ class WeakGeneratorWrapper(object):
        between normally sending a value
        or throwing an exception
        where the generator was paused.
+
+    .. attribute:: generator
+        Strong reference to the generator.
+        Will be retrieved from the :attr:`weak_geenrator` in a property.
+
+    .. attribute:: weak_generator
+        Instance of ``weakref.ref``
+        and weak reference to the generator
+
+    .. attribute:: catch_stopiteration
+        If ``True``,
+        ``StopIteration`` exceptions raised by the generator
+        will be caught by the 'next', '__next__', 'send' and 'throw' methods.
+        On Python >3.3 its value will be returned if available,
+        ``None`` otherwise.
+
+    .. attribute:: debug
+        If ``True``,
+        some debug information will be printed to ``sys.stdout``.
     """
 
     def __init__(self, weak_generator, catch_stopiteration=True, debug=False):
@@ -57,15 +76,13 @@ class WeakGeneratorWrapper(object):
 
         :type catch_stopiteration: bool
         :param catch_stopiteration:
-            Set to `False`
-            to not catch StopIteration exceptions
-            raised by methods that communicate with a generate,
-            i.e. next, __next__, send and throw.
+            Whether ``StopIteration`` exceptions should be caught.
+            Default: ``True``
 
         :type debug: bool
         :param debug:
-            Set to `True`
-            to get some debug information in `sys.stdout`.
+            Whether debug information should be printed.
+            Default: ``False``
         """
         self.weak_generator = weak_generator
         self.catch_stopiteration = catch_stopiteration
@@ -95,8 +112,31 @@ class WeakGeneratorWrapper(object):
 
     @property
     def next(self):
-        """TODOC"""
-        return partial(self._next, self.generator)
+        """Resume the generator.
+
+        Depending on :attr:`cls.catch_stopiteration`,
+        ``StopIteration`` exceptions will be caught
+        and their values returned instead,
+        if any.
+
+        :param value:
+            The value to send to the generator.
+            Default is ``None``,
+            which results in the same behavior
+            as calling 'next'/'__next__'.
+
+        :return:
+            The next yielded value
+            or the value that the generator returned
+            (using ``StopIteration`` or returning normally,
+            Python>3.3).
+
+        :raises:
+            Any exception raised by the generator.
+        """
+        func = partial(self._next, self.generator)
+        func.__doc__ = self.send.doc  # I hope this is how you do it
+        return func
 
     __next__ = next  # Python 3
 
@@ -105,8 +145,25 @@ class WeakGeneratorWrapper(object):
 
     @property
     def send(self):
-        """TODOC"""
-        return partial(self._send, self.generator)
+        """Send a value to the generator to resume it.
+
+        Depending on :attr:`cls.catch_stopiteration`,
+        ``StopIteration`` exceptions will be caught
+        and their values returned instead,
+        if any.
+
+        :return:
+            The next yielded value
+            or the value that the generator returned
+            (using ``StopIteration`` or returning normally,
+            Python>3.3).
+
+        :raises:
+            Any exception raised by the generator.
+        """
+        func = partial(self._send, self.generator)
+        func.__doc__ = self.send.doc
+        return func
 
     # TODO Methods that wait until generator is suspended.
     # Check if generator.gi_running works as expected and if it exists
@@ -120,14 +177,37 @@ class WeakGeneratorWrapper(object):
             try:
                 return generator.send(value)
             except StopIteration as si:
-                print(si)
                 return getattr(si, 'value', None)
         else:
             return generator.send(value)
 
     @property
     def throw(self):
-        """TODOC"""
+        """Raises an exception where the generator was suspended.
+
+        Depending on :attr:`cls.catch_stopiteration`,
+        ``StopIteration`` exceptions will be caught
+        and their values returned instead,
+        if any.
+
+        Accepts and expects the same parameters as ``generator.throw``.
+
+        :param type:
+        :param value:
+        :param traceback:
+            Refer to the standard Python documentation.
+
+        :return:
+            The next yielded value
+            or the value that the generator returned
+            (using ``StopIteration`` or returning normally,
+            Python>3.3).
+
+        :raises:
+            Any exception raised by the generator.
+            This includes the thrown exception
+            if the generator does not catch it.
+        """
         return partial(self._throw, self.generator)
 
     def _throw(self, generator, *args, **kwargs):
@@ -361,7 +441,7 @@ def test_throw(gw, i):
         time.sleep(0.4)
         if i >= 3:
             ret = gw.throw(TypeError, "%d is greater than 2" % i)
-            print("catched and returned:", ret)  # should be the above message
+            print("caught and returned:", ret)  # should be the above message
             next(gw)  # resume
         else:
             gw.send(i * 10)
