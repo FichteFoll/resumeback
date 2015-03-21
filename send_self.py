@@ -123,7 +123,7 @@ class WeakGeneratorWrapper(object):
                 print(si)
                 return getattr(si, 'value', None)
         else:
-            generator.send(value)
+            return generator.send(value)
 
     @property
     def throw(self):
@@ -139,7 +139,7 @@ class WeakGeneratorWrapper(object):
             except StopIteration as si:
                 return getattr(si, 'value', None)
         else:
-            generator.throw(*args, **kwargs)
+            return generator.throw(*args, **kwargs)
 
     @property
     def close(self):
