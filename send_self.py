@@ -1,4 +1,4 @@
-# Based on https://gist.github.com/Varriount/aba020b9d43c13d2794b
+from __future__ import print_function
 
 import weakref
 from functools import wraps, partial
