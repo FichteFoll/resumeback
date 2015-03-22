@@ -10,6 +10,17 @@ import threading
 import sublime_plugin
 import sublime
 
+__all__ = (
+    'WaitTimeoutError',
+    'WeakGeneratorWrapper',
+    'StrongGeneratorWrapper',
+    'send_self',
+)
+
+
+class WaitTimeoutError(RuntimeError):
+    pass
+
 
 class WeakGeneratorWrapper(object):
 
@@ -90,6 +101,11 @@ class WeakGeneratorWrapper(object):
 
         self._args = (weak_generator, catch_stopiteration, debug)
 
+        # We need this lock so that the '*_wait' methods do not get screwed
+        # after checking `generator.gi_running` and WILL succeed. This is of
+        # course bypassed by somone calling the generator's methods directly.
+        self._lock = threading.Lock()
+
         if self.debug:
             print("new Wrapper created", self)
 
@@ -110,6 +126,32 @@ class WeakGeneratorWrapper(object):
         """Get a WeakGeneratorWrapper with the same settings."""
         return self
 
+    # Utility and shorthand functions/methods for generating our "property"
+    # methods.
+    def _wait(self, generator, method, timeout=None, *args, **kwargs):
+        """Wait until generator is paused before running 'method'."""
+        if self.debug:
+            print("waiting for %s to pause" % generator)
+
+        while timeout is None or timeout > 0:
+            last_time = time.time()
+            if self._lock.acquire(timeout=timeout or -1):
+                try:
+                    if not generator.gi_running:
+                        # Will fail if the generator terminated
+                        return method(generator, *args, **kwargs)
+                finally:
+                    self._lock.release()
+
+            if timeout is not None:
+                timeout -= time.time() - last_time
+
+        msg = "%s did not pause after %ss" % (generator, timeout)
+        if self.debug:
+            print(msg)
+        raise WaitTimeoutError(msg)
+
+    # The "properties"
     @property
     def next(self):
         """Resume the generator.
@@ -134,6 +176,54 @@ class WeakGeneratorWrapper(object):
 
     def _next(self, generator):
         return self._send(generator)
+
+    @property
+    def next_wait(self):
+        """Wait before nexting a value to the generator to resume it.
+
+        Generally works like :meth:`next`,
+        but will wait until a thread is paused
+        before attempting to resume it.
+
+        Additional information:
+
+        :type timeout float:
+        :param timeout:
+            Time in seconds that should be waited
+            for suspension of the generator.
+            No timeout will be in effect
+            if ``None``.
+
+        :raises:
+            Additionally raises ``WaitTimeoutError``
+            if the generator has not been paused.
+        """
+        return partial(self._next_wait, self.generator)
+
+    def _next_wait(self, generator, timeout=None):
+        return self._wait(generator, self._next, timeout)
+
+    @property
+    def next_wait_async(self):
+        """Create a new waiting thread to next a value to the generator.
+
+        Works like :meth:`next_wait`
+        but does it asynchronously.
+        Does not timeout
+        (so no timeout parameter).
+
+        :return:
+            The created and running thread.
+        """
+        return partial(self.__next_wait_async, self.generator)
+
+    def _next_wait_async(self, generator):
+        thread = threading.Thread(
+            target=self._next_wait,
+            args=(generator,)
+        )
+        thread.start()
+        return thread
 
     @property
     def send(self):
@@ -161,10 +251,6 @@ class WeakGeneratorWrapper(object):
         """
         return partial(self._send, self.generator)
 
-    # TODO Methods that wait until generator is suspended.
-    # Check if generator.gi_running works as expected and if it exists
-    # in Py2, or catch `ValueError: generator already executing`.
-
     # A wrapper around send with a default value
     def _send(self, generator, value=None):
         if self.debug:
@@ -176,6 +262,55 @@ class WeakGeneratorWrapper(object):
                 return getattr(si, 'value', None)
         else:
             return generator.send(value)
+
+    @property
+    def send_wait(self):
+        """Wait before sending a value to the generator to resume it.
+
+        Generally works like :meth:`send`,
+        but will wait until a thread is paused
+        before attempting to resume it.
+
+        Additional information:
+
+        :type timeout float:
+        :param timeout:
+            Time in seconds that should be waited
+            for suspension of the generator.
+            No timeout will be in effect
+            if ``None``.
+
+        :raises:
+            Additionally raises ``WaitTimeoutError``
+            if the generator has not been paused.
+        """
+        return partial(self._send_wait, self.generator)
+
+    def _send_wait(self, generator, value=None, timeout=None):
+        return self._wait(generator, self._send, timeout, value)
+
+    @property
+    def send_wait_async(self):
+        """Create a new waiting thread to send a value to the generator.
+
+        Works like :meth:`send_wait`
+        but does it asynchronously.
+        Does not timeout
+        (so no timeout parameter).
+
+        :return:
+            The created and running thread.
+        """
+        return partial(self.__send_wait_async, self.generator)
+
+    def _send_wait_async(self, generator, value=None):
+        thread = threading.Thread(
+            target=self._send_wait,
+            args=(generator,),
+            kwargs={'value': value}
+        )
+        thread.start()
+        return thread
 
     @property
     def throw(self):
@@ -209,13 +344,64 @@ class WeakGeneratorWrapper(object):
     def _throw(self, generator, *args, **kwargs):
         if self.debug:
             print("throw:", generator, args, kwargs)
-        if self.catch_stopiteration:
-            try:
+        with self._lock:
+            if self.catch_stopiteration:
+                try:
+                    return generator.throw(*args, **kwargs)
+                except StopIteration as si:
+                    return getattr(si, 'value', None)
+            else:
                 return generator.throw(*args, **kwargs)
-            except StopIteration as si:
-                return getattr(si, 'value', None)
-        else:
-            return generator.throw(*args, **kwargs)
+
+    @property
+    def throw_wait(self):
+        """Wait before throwing a value to the generator to resume it.
+
+        Generally works like :meth:`throw`,
+        but will wait until a thread is paused
+        before attempting to resume it.
+
+        Additional information:
+
+        :type timeout float:
+        :param timeout:
+            Time in seconds that should be waited
+            for suspension of the generator.
+            No timeout will be in effect
+            if ``None``.
+
+        :raises:
+            Additionally raises ``WaitTimeoutError``
+            if the generator has not been paused.
+        """
+        return partial(self._throw_wait, self.generator)
+
+    def _throw_wait(self, generator, *args, **kwargs):
+        timeout = kwargs.pop('timeout', None)
+        return self._wait(generator, self._throw, timeout, *args, **kwargs)
+
+    @property
+    def throw_wait_async(self):
+        """Create a new waiting thread to throw a value to the generator.
+
+        Works like :meth:`throw_wait`
+        but does it asynchronously.
+        Does not timeout
+        (so no timeout parameter).
+
+        :return:
+            The created and running thread.
+        """
+        return partial(self._throw_wait_async, self.generator)
+
+    def _throw_wait_async(self, *args, **kwargs):
+        thread = threading.Thread(
+            target=self._throw_wait,
+            args=args,
+            kwargs=kwargs
+        )
+        thread.start()
+        return thread
 
     @property
     def close(self):
