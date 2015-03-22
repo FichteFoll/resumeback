@@ -119,12 +119,6 @@ class WeakGeneratorWrapper(object):
         and their values returned instead,
         if any.
 
-        :param value:
-            The value to send to the generator.
-            Default is ``None``,
-            which results in the same behavior
-            as calling 'next'/'__next__'.
-
         :return:
             The next yielded value
             or the value that the generator returned
@@ -134,9 +128,7 @@ class WeakGeneratorWrapper(object):
         :raises:
             Any exception raised by the generator.
         """
-        func = partial(self._next, self.generator)
-        func.__doc__ = self.send.doc  # I hope this is how you do it
-        return func
+        return partial(self._next, self.generator)
 
     __next__ = next  # Python 3
 
@@ -152,6 +144,12 @@ class WeakGeneratorWrapper(object):
         and their values returned instead,
         if any.
 
+        :param value:
+            The value to send to the generator.
+            Default is ``None``,
+            which results in the same behavior
+            as calling 'next'/'__next__'.
+
         :return:
             The next yielded value
             or the value that the generator returned
@@ -161,9 +159,7 @@ class WeakGeneratorWrapper(object):
         :raises:
             Any exception raised by the generator.
         """
-        func = partial(self._send, self.generator)
-        func.__doc__ = self.send.doc
-        return func
+        return partial(self._send, self.generator)
 
     # TODO Methods that wait until generator is suspended.
     # Check if generator.gi_running works as expected and if it exists
@@ -223,7 +219,7 @@ class WeakGeneratorWrapper(object):
 
     @property
     def close(self):
-        """Equivalent to `self.generator.close`."""
+        """Equivalent to ``self.generator.close``."""
         return self.generator.close
 
     __call__ = with_strong_ref
