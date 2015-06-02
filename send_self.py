@@ -545,7 +545,7 @@ def send_self(catch_stopiteration=True, finalize_callback=None, debug=False):
                 catch_stopiteration,
                 debug
             )
-            generator.send(gen_wrapper)
+        	gen_wrapper.send(gen_wrapper)
 
             return ret_value
 
