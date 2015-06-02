@@ -297,7 +297,7 @@ class WeakGeneratorWrapper(object):
         :return:
             The created and running thread.
         """
-        return partial(self.__send_wait_async, self.generator)
+        return partial(self._send_wait_async, self.generator)
 
     def _send_wait_async(self, generator, value=None):
         thread = threading.Thread(
