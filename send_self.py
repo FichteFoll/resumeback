@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 from functools import partial, wraps
+import inspect
 import threading
 import time
 import weakref
@@ -409,6 +410,15 @@ class WeakGeneratorWrapper(object):
     def close(self):
         """Equivalent to ``self.generator.close``."""
         return self.generator.close
+
+    def has_terminated(self):
+        """Check if the wrapped generator has terminated.
+
+        :return bool:
+            Whether the generator has terminated.
+        """
+        gen = self.generator
+        return gen is None or inspect.getgeneratorstate(gen) == "'GEN_CLOSED'"
 
     __call__ = with_strong_ref
 
