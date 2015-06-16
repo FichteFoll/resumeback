@@ -219,6 +219,8 @@ class WeakGeneratorWrapper(object):
             target=self._next_wait,
             args=(generator,)
         )
+        if self.debug:
+            print("spawned new thread to call %s_wait: %r" % ('next', thread))
         thread.start()
         return thread
 
@@ -306,6 +308,8 @@ class WeakGeneratorWrapper(object):
             args=(generator,),
             kwargs={'value': value}
         )
+        if self.debug:
+            print("spawned new thread to call %s_wait: %r" % ('send', thread))
         thread.start()
         return thread
 
@@ -396,6 +400,8 @@ class WeakGeneratorWrapper(object):
             args=args,
             kwargs=kwargs
         )
+        if self.debug:
+            print("spawned new thread to call %s_wait: %r" % ('throw', thread))
         thread.start()
         return thread
 
