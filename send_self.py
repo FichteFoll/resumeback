@@ -193,7 +193,7 @@ class WeakGeneratorWrapper(object):
             if ``None``.
 
         :raises:
-            Additionally raises ``WaitTimeoutError``
+            Additionally raises :cls:`WaitTimeoutError`
             if the generator has not been paused.
         """
         return partial(self._next_wait, self.generator)
@@ -281,7 +281,7 @@ class WeakGeneratorWrapper(object):
             if ``None``.
 
         :raises:
-            Additionally raises ``WaitTimeoutError``
+            Additionally raises :cls:`WaitTimeoutError`
             if the generator has not been paused.
         """
         return partial(self._send_wait, self.generator)
@@ -372,7 +372,7 @@ class WeakGeneratorWrapper(object):
             if ``None``.
 
         :raises:
-            Additionally raises ``WaitTimeoutError``
+            Additionally raises :cls:`WaitTimeoutError`
             if the generator has not been paused.
         """
         return partial(self._throw_wait, self.generator)
@@ -502,7 +502,8 @@ def send_self(catch_stopiteration=True, finalize_callback=None, debug=False,
     (unless you know what you are doing).
     Otherwise the generator will not be garbage-collected
     if it is paused due to a yield
-    and not called again.
+    and not called again
+    due to a cyclic reference.
 
     See :class:`WeakGeneratorWrapper` for what you can do with it.
 
@@ -587,6 +588,7 @@ def send_self_return(catch_stopiteration=True, finalize_callback=None, debug=Fal
 
 # We either directly call this, or return it to be called by Python's
 # decorator mechanism.
+# Since functools.partial is used, 'func' needs to be at the end.
 def _send_self(catch_stopiteration, finalize_callback, debug, return_yield,
                func):
     if not inspect.isgeneratorfunction(func):
