@@ -530,6 +530,12 @@ def send_self(catch_stopiteration=True, finalize_callback=None, debug=False,
         with the generator not being resumed or finalized.
         Forwarded to the Wrapper.
 
+    :raises TypeError:
+        If the parameters are not of types as specified.
+    :raises ValueError:
+        If the callable is not a generator
+        or ``finalize_callback`` is not callable.
+
     :return:
         A :class:`StrongGeneratorWrapper` instance
         holding the created generator.
@@ -538,18 +544,29 @@ def send_self(catch_stopiteration=True, finalize_callback=None, debug=False,
     # clarity, we mirror that to first_param and override catch_stopiteration
     # later.
     first_param = catch_stopiteration
-    catch_stopiteration = True
+    catch_stopiteration = first_param if not callable(first_param) else True
 
-    # If the argument is a callable, we've been used without being directly
-    # passed an argument by the user, and thus should call _send_self directly.
+    # Typechecking
+    type_table = [
+        ('catch_stopiteration', catch_stopiteration, bool),
+        ('debug', debug, bool),
+    ]
+    for name, val, type_ in type_table:
+        if not isinstance(val, type_):
+            raise TypeError("Expected %s for parameter '%s', got %s"
+                            % (type_, name, type(val)))
+
+    if finalize_callback is not None and not callable(finalize_callback):
+        raise TypeError("Expected callable type for 'finalize_callback'")
+
     if callable(first_param):
-        # No arguments, this is the decorator.
+        # If the argument is a callable, we've been used without being directly
+        # passed an argument by the user, and thus should call _send_self directly.
         return _send_self(catch_stopiteration, finalize_callback, debug,
                           __return_yield, first_param)
     else:
-        # Someone has called @send_self(...) with parameters and thus we need to
-        # return _send_self to be called indirectly.
-        catch_stopiteration = first_param
+        # Someone has called @send_self(...) with parameters and thus we return
+        # _send_self to be called indirectly, as a partial.
         return partial(_send_self,
                        catch_stopiteration, finalize_callback, debug,
                        __return_yield)
@@ -572,6 +589,9 @@ def send_self_return(catch_stopiteration=True, finalize_callback=None, debug=Fal
 # decorator mechanism.
 def _send_self(catch_stopiteration, finalize_callback, debug, return_yield,
                func):
+    if not inspect.isgeneratorfunction(func):
+        raise ValueError("Callable must be a generatorfunction")
+
     @wraps(func)
     def send_self_wrapper(*args, **kwargs):
         # optional but for clarity
