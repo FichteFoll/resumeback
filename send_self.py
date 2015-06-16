@@ -341,14 +341,13 @@ class WeakGeneratorWrapper(object):
     def _throw(self, generator, *args, **kwargs):
         if self.debug:
             print("throw:", generator, args, kwargs)
-        with self._lock:
-            if self.catch_stopiteration:
-                try:
-                    return generator.throw(*args, **kwargs)
-                except StopIteration as si:
-                    return getattr(si, 'value', None)
-            else:
+        if self.catch_stopiteration:
+            try:
                 return generator.throw(*args, **kwargs)
+            except StopIteration as si:
+                return getattr(si, 'value', None)
+        else:
+            return generator.throw(*args, **kwargs)
 
     @property
     def throw_wait(self):
