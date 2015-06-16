@@ -531,7 +531,7 @@ def send_self(catch_stopiteration=True, finalize_callback=None, debug=False,
         Forwarded to the Wrapper.
 
     :return:
-        The :class:`WeakGeneratorWrapper` instance
+        A :class:`StrongGeneratorWrapper` instance
         holding the created generator.
     """
     # "catch_stopiteration" needs to be the name of the first parameter. For
@@ -597,7 +597,7 @@ def _send_self(catch_stopiteration, finalize_callback, debug, return_yield,
         gen_wrapper.send(gen_wrapper)
 
         if not return_yield:
-            ret_value = gen_wrapper
+            ret_value = gen_wrapper.with_strong_ref()
         return ret_value
 
     return send_self_wrapper
