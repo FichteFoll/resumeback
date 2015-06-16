@@ -429,9 +429,11 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
 
     Generally operates similar to :class:`WeakGeneratorWrapper`,
     except that it holds a string reference to the generator.
-    You will want to pass an instance of this class around
-    while the generator is paused
-    so that it is not garbage-collected.
+    Use this class
+    if you want to pass a generator wrapper around,
+    so that the generator is not garbage-collected.
+
+    ``__call__`` is an alias for :meth:`with_weak_ref`.
 
     IMPORTANT:
     DO NOT BIND AN INSTANCE OF THIS
@@ -472,7 +474,7 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
         """Get a WeakGeneratorWrapper with the same settings."""
         return WeakGeneratorWrapper(*self._args)
 
-    __call__ = with_strong_ref
+    __call__ = with_weak_ref
 
 
 def send_self(catch_stopiteration=True, finalize_callback=None, debug=False,
