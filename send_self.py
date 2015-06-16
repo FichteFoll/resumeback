@@ -206,18 +206,18 @@ class WeakGeneratorWrapper(object):
 
         Works like :meth:`next_wait`
         but does it asynchronously.
-        Does not timeout
-        (so no timeout parameter).
+        The thread spawned raises :cls:`WaitTimeoutError`
+        when it times out.
 
         :return:
             The created and running thread.
         """
         return partial(self._next_wait_async, self.generator)
 
-    def _next_wait_async(self, generator):
+    def _next_wait_async(self, generator, timeout=None):
         thread = threading.Thread(
             target=self._next_wait,
-            args=(generator,)
+            args=(generator, timeout)
         )
         if self.debug:
             print("spawned new thread to call %s_wait: %r" % ('next', thread))
@@ -294,19 +294,19 @@ class WeakGeneratorWrapper(object):
 
         Works like :meth:`send_wait`
         but does it asynchronously.
-        Does not timeout
-        (so no timeout parameter).
+        The thread spawned raises :cls:`WaitTimeoutError`
+        when it times out.
 
         :return:
             The created and running thread.
         """
         return partial(self._send_wait_async, self.generator)
 
-    def _send_wait_async(self, generator, value=None):
+    def _send_wait_async(self, generator, value=None, timeout=None):
         thread = threading.Thread(
             target=self._send_wait,
             args=(generator,),
-            kwargs={'value': value}
+            kwargs={'value': value, 'timeout': timeout}
         )
         if self.debug:
             print("spawned new thread to call %s_wait: %r" % ('send', thread))
@@ -386,10 +386,10 @@ class WeakGeneratorWrapper(object):
 
         Works like :meth:`throw_wait`
         but does it asynchronously.
-        Does not timeout
-        (so no timeout parameter).
+        The thread spawned raises :cls:`WaitTimeoutError`
+        when it times out.
 
-        :return:
+        :return threading.Thread:
             The created and running thread.
         """
         return partial(self._throw_wait_async, self.generator)
