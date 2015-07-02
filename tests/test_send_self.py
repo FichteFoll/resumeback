@@ -82,33 +82,45 @@ class TestSendSelfEnvironment(object):
 
         assert func() == val
 
-    def test_catch_stopiteration(self):
+    def test_not_catch_stopiteration(self):
         @send_self(catch_stopiteration=False)
         def func():
             yield
+            try:
+                yield
+            except:
+                pass
             # Raises here
 
-        with pytest.raises(StopIteration):
-            func()
+        for meth, args in [("next", []),
+                           ("send", [11]),
+                           ("throw", [ValueError])]:
+            w = func()
+            with pytest.raises(StopIteration):
+                getattr(w, meth)(*args)
 
-        @send_self(catch_stopiteration=False)
-        def func2():
-            yield
-            yield
-            # Raises here
+    def test_not_catch_stopiteration_value(self):
+        val = id(self) + 100
 
-        wrapper = func2()
-        with pytest.raises(StopIteration):
-            wrapper.next()
-
-    def test_catch_stopiteration_return_value(self):
         @send_self(catch_stopiteration=False)
         def func():
             yield
-            return 12  # Raises StopIteration here
+            try:
+                yield
+            except:
+                pass
+            return val  # Raises StopIteration here
 
-        with pytest.raises(StopIteration):
-            func()
+        for meth, args in [("next", []),
+                           ("send", [val + 1]),
+                           ("throw", [ValueError])]:
+            w = func()
+            try:
+                getattr(w, meth)(*args)
+            except StopIteration as si:
+                assert si.value == val
+            else:
+                pytest.fail("Did not raise")
 
     def test_finalize_callback(self):
         wref = None
