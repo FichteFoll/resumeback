@@ -360,3 +360,24 @@ class TestSendSelfDeferring(object):
 
         wait_until_finished(func().with_weak_ref())
         assert run
+
+    def test_wait_async_timeout(self):
+        run = False
+
+        @send_self(debug=True)
+        def func():
+            nonlocal run
+            this = yield
+
+            t1 = this.next_wait_async(timeout=0.01)
+            t2 = this.send_wait_async(1, timeout=0.01)
+            t3 = this.throw_wait_async(RuntimeError, timeout=0.01)
+
+            time.sleep(0.1)
+            assert not t1.is_alive()
+            assert not t2.is_alive()
+            assert not t3.is_alive()
+            run = True
+
+        func()
+        assert run
