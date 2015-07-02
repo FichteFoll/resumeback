@@ -131,6 +131,7 @@ class WeakGeneratorWrapper(object):
         if self.debug:
             print("waiting for %s to pause" % generator)
 
+        original_timeout = timeout
         while timeout is None or timeout > 0:
             last_time = time.time()
             if self._lock.acquire(timeout=timeout or -1):
@@ -144,7 +145,7 @@ class WeakGeneratorWrapper(object):
             if timeout is not None:
                 timeout -= time.time() - last_time
 
-        msg = "%s did not pause after %ss" % (generator, timeout)
+        msg = "%s did not pause after %ss" % (generator, original_timeout)
         if self.debug:
             print(msg)
         raise WaitTimeoutError(msg)
