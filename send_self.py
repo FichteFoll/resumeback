@@ -206,7 +206,7 @@ class WeakGeneratorWrapper(object):
 
     @property
     def next_wait_async(self):
-        """Create a new waiting thread to next a value to the generator.
+        """Create a waiting daemon thread to resume the generator.
 
         Works like :meth:`next_wait`
         but does it asynchronously.
@@ -222,7 +222,8 @@ class WeakGeneratorWrapper(object):
     def _next_wait_async(self, generator, timeout=None):
         thread = threading.Thread(
             target=self._next_wait,
-            args=(generator, timeout)
+            args=(generator, timeout),
+            daemon=True
         )
         if self.debug:
             print("spawned new thread to call %s_wait: %r" % ('next', thread))
@@ -295,7 +296,7 @@ class WeakGeneratorWrapper(object):
 
     @property
     def send_wait_async(self):
-        """Create a new waiting thread to send a value to the generator.
+        """Create a waiting daemon thread to send a value to the generator.
 
         Works like :meth:`send_wait`
         but does it asynchronously.
@@ -312,7 +313,8 @@ class WeakGeneratorWrapper(object):
         thread = threading.Thread(
             target=self._send_wait,
             args=(generator,),
-            kwargs={'value': value, 'timeout': timeout}
+            kwargs={'value': value, 'timeout': timeout},
+            daemon=True
         )
         if self.debug:
             print("spawned new thread to call %s_wait: %r" % ('send', thread))
@@ -390,7 +392,7 @@ class WeakGeneratorWrapper(object):
 
     @property
     def throw_wait_async(self):
-        """Create a new waiting thread to throw a value to the generator.
+        """Create a waiting daemon thread to throw a value in the generator.
 
         Works like :meth:`throw_wait`
         but does it asynchronously.
@@ -407,7 +409,8 @@ class WeakGeneratorWrapper(object):
         thread = threading.Thread(
             target=self._throw_wait,
             args=args,
-            kwargs=kwargs
+            kwargs=kwargs,
+            daemon=True
         )
         if self.debug:
             print("spawned new thread to call %s_wait: %r" % ('throw', thread))
