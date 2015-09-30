@@ -99,10 +99,14 @@ class WeakGeneratorWrapper(object):
 
         self._args = (weak_generator, catch_stopiteration, debug)
 
-        # We need this lock so that the '*_wait' methods do not get screwed
-        # after checking `generator.gi_running` and WILL succeed. This is of
-        # course bypassed by somone calling the generator's methods directly.
-        self._lock = threading.Lock()
+        # We use this lock
+        # so that the '*_wait' methods do not get screwed
+        # after checking `generator.gi_running`
+        # and WILL succeed,
+        # as long as the wrapper is used.
+        # This is of course bypassed
+        # by somone calling the generator's methods directly.
+        self._lock = threading.RLock()
 
         if self.debug:
             print("new Wrapper created", self)
@@ -136,8 +140,7 @@ class WeakGeneratorWrapper(object):
             last_time = time.time()
             if self._lock.acquire(timeout=timeout or -1):
                 try:
-                    if not generator.gi_running:
-                        # Will fail if the generator terminated
+                    if self.can_resume():
                         return method(generator, *args, **kwargs)
                 finally:
                     self._lock.release()
@@ -256,13 +259,14 @@ class WeakGeneratorWrapper(object):
     def _send(self, generator, value=None):
         if self.debug:
             print("send:", generator, value)
-        if self.catch_stopiteration:
-            try:
+        with self._lock:
+            if self.catch_stopiteration:
+                try:
+                    return generator.send(value)
+                except StopIteration as si:
+                    return getattr(si, 'value', None)
+            else:
                 return generator.send(value)
-            except StopIteration as si:
-                return getattr(si, 'value', None)
-        else:
-            return generator.send(value)
 
     @property
     def send_wait(self):
@@ -347,13 +351,14 @@ class WeakGeneratorWrapper(object):
     def _throw(self, generator, *args, **kwargs):
         if self.debug:
             print("throw:", generator, args, kwargs)
-        if self.catch_stopiteration:
-            try:
+        with self._lock:
+            if self.catch_stopiteration:
+                try:
+                    return generator.throw(*args, **kwargs)
+                except StopIteration as si:
+                    return getattr(si, 'value', None)
+            else:
                 return generator.throw(*args, **kwargs)
-            except StopIteration as si:
-                return getattr(si, 'value', None)
-        else:
-            return generator.throw(*args, **kwargs)
 
     @property
     def throw_wait(self):
@@ -418,8 +423,24 @@ class WeakGeneratorWrapper(object):
         :return bool:
             Whether the generator has terminated.
         """
+        # Equivalent to
+        # `inspect.getgeneratorstate(self.generator) == inspect.GEN_CLOSED`
         gen = self.generator
-        return gen is None or inspect.getgeneratorstate(gen) == "'GEN_CLOSED'"
+        return gen is None or gen.gi_frame is None
+
+    def can_resume(self):
+        """Test if the generator can be resumed, i.e. is not running or closed.
+
+        :return bool:
+            Whether the generator can be resumed.
+        """
+        # Equivalent to `inspect.getgeneratorstate(self.generator) in
+        # (inspect.GEN_CREATED, inspect.GEN_SUSPENDED)`,
+        # which is only available starting 3.2.
+        gen = self.generator
+        return (gen is not None
+                and not gen.gi_running
+                and gen.gi_frame is not None)
 
     __call__ = with_strong_ref
 
