@@ -121,15 +121,15 @@ class WeakGeneratorWrapper(object):
         return self.weak_generator()
 
     def with_strong_ref(self):
-        """Get a StrongGeneratorWrapper with the same settings."""
+        """Get a StrongGeneratorWrapper with the same attributes."""
         return StrongGeneratorWrapper(self.generator, *self._args)
 
     def with_weak_ref(self):
-        """Get a WeakGeneratorWrapper with the same settings."""
+        """Get a WeakGeneratorWrapper with the same attributes."""
         return self
 
-    # Utility and shorthand functions/methods for generating our "property"
-    # methods.
+    # Utility and shorthand functions/methods
+    # for generating our "property" methods.
     def _wait(self, generator, method, timeout=None, *args, **kwargs):
         """Wait until generator is paused before running 'method'."""
         if self.debug:
@@ -196,8 +196,7 @@ class WeakGeneratorWrapper(object):
             No timeout will be in effect
             if ``None``.
 
-        :raises:
-            Additionally raises :cls:`WaitTimeoutError`
+        :raises WaitTimeoutError:
             if the generator has not been paused.
         """
         return partial(self._next_wait, self.generator)
@@ -214,6 +213,7 @@ class WeakGeneratorWrapper(object):
         The thread spawned raises :cls:`WaitTimeoutError`
         when it times out.
 
+        :rtype threading.Thread:
         :return:
             The created and running thread.
         """
@@ -285,8 +285,7 @@ class WeakGeneratorWrapper(object):
             No timeout will be in effect
             if ``None``.
 
-        :raises:
-            Additionally raises :cls:`WaitTimeoutError`
+        :raises WaitTimeoutError:
             if the generator has not been paused.
         """
         return partial(self._send_wait, self.generator)
@@ -303,6 +302,7 @@ class WeakGeneratorWrapper(object):
         The thread spawned raises :cls:`WaitTimeoutError`
         when it times out.
 
+        :rtype threading.Thread:
         :return:
             The created and running thread.
         """
@@ -344,7 +344,9 @@ class WeakGeneratorWrapper(object):
         :raises:
             Any exception raised by the generator.
             This includes the thrown exception
-            if the generator does not catch it.
+            if the generator does not catch it
+            and excludes `StopIteration`
+            if :attr:`catch_stopiteration` is set.
         """
         return partial(self._throw, self.generator)
 
@@ -364,7 +366,7 @@ class WeakGeneratorWrapper(object):
     def throw_wait(self):
         """Wait before throwing a value to the generator to resume it.
 
-        Generally works like :meth:`throw`,
+        Works like :meth:`throw`,
         but will wait until a thread is paused
         before attempting to resume it.
 
@@ -377,8 +379,7 @@ class WeakGeneratorWrapper(object):
             No timeout will be in effect
             if ``None``.
 
-        :raises:
-            Additionally raises :cls:`WaitTimeoutError`
+        :raises WaitTimeoutError:
             if the generator has not been paused.
         """
         return partial(self._throw_wait, self.generator)
@@ -396,7 +397,8 @@ class WeakGeneratorWrapper(object):
         The thread spawned raises :cls:`WaitTimeoutError`
         when it times out.
 
-        :return threading.Thread:
+        :rtype threading.Thread:
+        :return:
             The created and running thread.
         """
         return partial(self._throw_wait_async, self.generator)
@@ -449,10 +451,10 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
 
     """Wraps a generator and adds convenience features.
 
-    Generally operates similar to :class:`WeakGeneratorWrapper`,
-    except that it holds a string reference to the generator.
+    Operates similar to :class:`WeakGeneratorWrapper`,
+    except that it holds a strong reference to the generator.
     Use this class
-    if you want to pass a generator wrapper around,
+    if you want to pass the generator wrapper itself around,
     so that the generator is not garbage-collected.
 
     ``__call__`` is an alias for :meth:`with_weak_ref`.
@@ -463,7 +465,7 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
     (unless you know what you are doing).
     Otherwise the generator will not be garbage-collected
     if it is paused due to a yield
-    and not called again.
+    and not resumed again.
     """
 
     generator = None  # Override property of WeakGeneratorWrapper
@@ -480,7 +482,7 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
         For other parameters see :meth:`WeakGeneratorWrapper.__init__`.
         """
         # It's important that the weak_generator object reference is preserved
-        # because it will hold the `finalize_callback` callback from @send_self.
+        # because it will hold `finalize_callback` from @send_self.
         self.generator = generator
 
         if weak_generator is None:
@@ -489,11 +491,11 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
                                                      **kwargs)
 
     def with_strong_ref(self):
-        """Get a StrongGeneratorWrapper with the same settings."""
+        """Get a StrongGeneratorWrapper with the same attributes."""
         return self
 
     def with_weak_ref(self):
-        """Get a WeakGeneratorWrapper with the same settings."""
+        """Get a WeakGeneratorWrapper with the same attributes."""
         return WeakGeneratorWrapper(*self._args)
 
     __call__ = with_weak_ref
