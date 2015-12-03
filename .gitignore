@@ -1,4 +1,10 @@
-*.pyc
+# uninteresting dev files
 *.sublime-*
-htmlcov/
+
+# (binary) cache files
+*.pyc
 **/cache
+
+# coverage
+htmlcov/
+.coverage
