@@ -8,9 +8,9 @@ import weakref
 
 
 __all__ = (
+    'StrongGeneratorWrapper',
     'WaitTimeoutError',
     'WeakGeneratorWrapper',
-    'StrongGeneratorWrapper',
     'send_self',
     'send_self_return',
 )
@@ -177,6 +177,8 @@ class WeakGeneratorWrapper(object):
     __next__ = next  # Python 3
 
     def _next(self, generator):
+        if self.debug:
+            print("next:", generator)
         return self._send(generator)
 
     @property
@@ -447,6 +449,11 @@ class WeakGeneratorWrapper(object):
                 and not gen.gi_running
                 and gen.gi_frame is not None)
 
+    def __eq__(self, other):
+        if type(other) is WeakGeneratorWrapper:
+            return self._args == other._args
+        return NotImplemented
+
     __call__ = with_strong_ref
 
 
@@ -490,6 +497,7 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
 
         if weak_generator is None:
             weak_generator = weakref.ref(generator)
+
         super(StrongGeneratorWrapper, self).__init__(weak_generator, *args,
                                                      **kwargs)
 
@@ -500,6 +508,12 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
     def with_weak_ref(self):
         """Get a WeakGeneratorWrapper with the same attributes."""
         return WeakGeneratorWrapper(*self._args)
+
+    def __eq__(self, other):
+        if type(other) is StrongGeneratorWrapper:
+            return (self.generator == other.generator
+                    and self._args == other._args)
+        return NotImplemented
 
     __call__ = with_weak_ref
 
