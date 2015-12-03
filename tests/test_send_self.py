@@ -13,53 +13,12 @@ from ..send_self import (
     StrongGeneratorWrapper
 )
 
+from . import CustomError, defer, wait_until_finished
+
 # TODO stopiteration return values
 # TODO only gc'd when deferred thread terminates and does not call
 # TODO not gc'd
 # TODO subgenerator shit
-
-
-default_sleep = 0.1
-
-
-def defer(callback, *args, sleep=default_sleep, expected_return=None, call=True,
-          **kwargs):
-
-    def func():
-        time.sleep(sleep)
-        if call:
-            assert expected_return == callback(*args, **kwargs)
-        else:
-            print("generator is not re-called")
-
-    t = threading.Thread(target=func)
-    t.start()
-
-
-def wait_until_finished(wrapper, timeout=None, sleep=default_sleep,
-                        defer_calls=1):
-    # Can not be called with StrongGeneratorWrapper, likely because it will be
-    # bound in some frame and thus its reference won't get gc'd when it would
-    # otherwise.
-    assert type(wrapper) is WeakGeneratorWrapper
-
-    if not timeout:
-        timeout = defer_calls * default_sleep + 1
-
-    ref = wrapper.weak_generator
-    start_time = time.time()
-    while time.time() < start_time + timeout:
-        if wrapper.has_terminated():
-            return
-        time.sleep(sleep)
-    else:
-        if ref() is None:
-            return
-        raise RuntimeError("Has not been collected within %ss" % timeout)
-
-
-class TestGeneratorWrapper(object):
-    pass
 
 
 class TestSendSelfEnvironment(object):
