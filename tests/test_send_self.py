@@ -63,24 +63,33 @@ class TestGeneratorWrapper(object):
 
 
 class TestSendSelfEnvironment(object):
+
     def test_wrapper_type(self):
+        run = False
+
         @send_self
         def func():
+            nonlocal run
             this = yield
             assert type(this) is WeakGeneratorWrapper
+            run = True
 
         assert type(func() is StrongGeneratorWrapper)
+        assert run
 
     def test_send_self_return(self):
         val = 123 + id(self)
+        run = False
 
         @send_self_return
         def func():
-            nonlocal val
+            nonlocal val, run
             this = yield val
             assert type(this) is WeakGeneratorWrapper
+            run = True
 
         assert func() == val
+        assert run
 
     def test_not_catch_stopiteration(self):
         @send_self(catch_stopiteration=False)
@@ -88,13 +97,13 @@ class TestSendSelfEnvironment(object):
             yield
             try:
                 yield
-            except:
+            except CustomError:
                 pass
-            # Raises here
+            # Raises StopIteration here
 
-        for meth, args in [("next", []),
-                           ("send", [11]),
-                           ("throw", [ValueError])]:
+        for meth, args in [('next',  []),
+                           ('send',  [11]),
+                           ('throw', [CustomError])]:
             w = func()
             with pytest.raises(StopIteration):
                 getattr(w, meth)(*args)
@@ -104,16 +113,17 @@ class TestSendSelfEnvironment(object):
 
         @send_self(catch_stopiteration=False)
         def func():
+            nonlocal val
             yield
             try:
                 yield
-            except:
+            except CustomError:
                 pass
             return val  # Raises StopIteration here
 
-        for meth, args in [("next", []),
-                           ("send", [val + 1]),
-                           ("throw", [ValueError])]:
+        for meth, args in [('next',  []),
+                           ('send',  [val + 1]),
+                           ('throw', [CustomError])]:
             w = func()
             try:
                 getattr(w, meth)(*args)
@@ -124,24 +134,24 @@ class TestSendSelfEnvironment(object):
 
     def test_finalize_callback(self):
         wref = None
-        called = False
+        called = 0
 
         def cb(ref):
             nonlocal called, wref
-            assert ref == wref
+            assert ref is wref
             assert ref() is None
-            called = True
+            called += 1
 
         @send_self(finalize_callback=cb)
         def func():
-            nonlocal wref
+            nonlocal called, wref
             this = yield
             wref = this.weak_generator
+            called += 1
             # Now, terminate and let gc do its work
 
         func()
-        # gc.collect()  # not needed
-        assert called
+        assert called == 2
 
     def test_cleanup_return(self):
         @send_self
@@ -150,7 +160,6 @@ class TestSendSelfEnvironment(object):
             # implicit return
 
         ref = func().weak_generator
-        # gc.collect()  # not needed
         assert ref() is None
 
     def test_cleanup_yield(self):
@@ -160,7 +169,6 @@ class TestSendSelfEnvironment(object):
             yield
 
         ref = func().weak_generator
-        # gc.collect()  # not needed
         assert ref() is None
 
     def test_yield_return(self):
@@ -173,25 +181,26 @@ class TestSendSelfEnvironment(object):
         assert val == func()
 
     def test_yield_parameter(self):
+        run = False
         val = ("const", id(self))
 
         @send_self
         def func(param):
+            nonlocal val, run
             yield
-            nonlocal val
             assert param == val
+            run = True
 
         func(val)
-
-    def generic_gen():
-        yield
+        assert run
 
     @pytest.mark.parametrize(
-        ['error', 'func', 'args', 'kwargs'],
+        'error, func, args, kwargs',
         [
             # "func" arg
             (ValueError, test_yield_parameter, [], {}),
             (ValueError, lambda x: x ** 2, [], {}),
+            (ValueError, type, [], {}),
             # send_self args
             (TypeError, None, [1], {}),
             (TypeError, None, ["str"], {}),
@@ -214,6 +223,7 @@ class TestSendSelfEnvironment(object):
 
 
 class TestSendSelfDeferring(object):
+
     def test_next(self):
         run = False
 
@@ -249,8 +259,8 @@ class TestSendSelfDeferring(object):
             this = yield
 
             val = 345 + id(func)
-            received = yield defer(this.send, val)
-            assert received == val
+            assert (yield defer(this.send, val)) == val
+            assert (yield defer(this.send)) is None
             run = True
 
         wait_until_finished(func().with_weak_ref(), defer_calls=1)
@@ -265,12 +275,13 @@ class TestSendSelfDeferring(object):
             this = yield
 
             val = 345 + id(func)
-            defer(this.throw, ValueError, val)
+            defer(this.throw, CustomError, val)
             try:
                 yield
-                pytest.fail("no exception thrown")
-            except ValueError as e:
+            except CustomError as e:
                 assert e.args == (val,)
+            else:
+                pytest.fail("no exception thrown")
 
             run = True
 
@@ -285,11 +296,11 @@ class TestSendSelfDeferring(object):
             yield
             try:
                 yield
-            except ValueError:
+            except CustomError:
                 return val
 
         wrapper = func()
-        assert val == wrapper.throw(ValueError)
+        assert val == wrapper.throw(CustomError)
         wrapper = wrapper.with_weak_ref()  # Allow for gc
         gc.collect()
         assert wrapper.generator is None
@@ -310,15 +321,15 @@ class TestSendSelfDeferring(object):
             time.sleep(0.01)
             yield
 
-            defer(this.throw_wait, ValueError, sleep=0, timeout=0.1)
+            defer(this.throw_wait, CustomError, sleep=0, timeout=0.1)
             time.sleep(0.01)
-            with pytest.raises(ValueError):
+            with pytest.raises(CustomError):
                 yield
 
             run = True
             yield
 
-        wait_until_finished(func().with_weak_ref(), timeout=3)
+        wait_until_finished(func().with_weak_ref(), timeout=1)
         assert run
 
     def test_wait_timeout(self):
@@ -361,14 +372,12 @@ class TestSendSelfDeferring(object):
             received = yield
             assert received == val
 
-            this.throw_wait_async(ValueError, timeout=0.5)
+            this.throw_wait_async(CustomError, timeout=0.5)
             time.sleep(0.1)
-            print(2)
-            with pytest.raises(ValueError):
+            with pytest.raises(CustomError):
                 yield
 
             run = True
-            print("finished")
 
         wait_until_finished(func().with_weak_ref())
         assert run
