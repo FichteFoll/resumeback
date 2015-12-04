@@ -439,6 +439,7 @@ class WeakGeneratorWrapper(object):
         :return bool:
             Whether the generator has terminated.
         """
+        # TOCHECK relies on generator.gi_frame
         # Equivalent to
         # `inspect.getgeneratorstate(self.generator) == inspect.GEN_CLOSED`
         gen = self.generator
@@ -450,6 +451,7 @@ class WeakGeneratorWrapper(object):
         :return bool:
             Whether the generator can be resumed.
         """
+        # TOCHECK relies on generator.gi_frame
         # Equivalent to `inspect.getgeneratorstate(self.generator) in
         # (inspect.GEN_CREATED, inspect.GEN_SUSPENDED)`,
         # which is only available starting 3.2.
