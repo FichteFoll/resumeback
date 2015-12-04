@@ -654,18 +654,6 @@ class send_self(metaclass=SendSelfMeta):
 
         return self._start_generator(generator)
 
-    def as_subgenerator(self, other_wrapper, *args, **kwargs):
-        """TODO"""
-        # Create generator
-        generator = self._func(*args, **kwargs)
-
-        # Start generator
-        next(generator)
-
-        # Send the "other wrapper" to the new generator
-        generator.send(other_wrapper)
-        return generator
-
 
 class send_self_return(send_self):
 
