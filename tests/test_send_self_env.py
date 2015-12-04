@@ -3,7 +3,6 @@ import pytest
 from ..send_self import (
     send_self,
     send_self_return,
-    WaitTimeoutError,
     WeakGeneratorWrapper,
     StrongGeneratorWrapper
 )
@@ -39,6 +38,24 @@ class TestSendSelfEnvironment(object):
 
         assert func() == val
         assert run
+
+    def test_wrapping(self):
+        def func():
+            """generic docstring"""
+            yield
+
+        attributes = ["__%s__" % a
+                      for a in 'doc,name,module,annotations'.split(',')]
+
+        for cls in (send_self,       send_self_return,
+                    send_self(True), send_self_return(True)):
+            wrapped = cls(func)
+            for attr in attributes:
+                if hasattr(wrapped, attr):
+                    assert getattr(wrapped, attr) == getattr(func, attr)
+
+            if hasattr(wrapped, '__wrapped__'):
+                assert wrapped.__wrapped__ is func
 
     def test_not_catch_stopiteration(self):
         @send_self(catch_stopiteration=False)
