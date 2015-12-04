@@ -92,21 +92,58 @@ class TestSendSelfDeferring(object):
     def test_close(self):
         run = 0
 
-        def cb(f):
-            f.close()
-
         @send_self
         def func():
             nonlocal run
             this = yield
             run = 1
-            # this.close()
             yield defer(this.close)
             run = 2
 
         wrapper = func()
         wait_until_finished(wrapper)
         assert run == 1
+        assert wrapper.has_terminated()
+
+    def test_close_generatorexit(self):
+        run = 0
+
+        def cb(this):
+            nonlocal run
+            with pytest.raises(RuntimeError):
+                this.close()
+            run += 1
+            this.next()
+
+        @send_self
+        def func():
+            nonlocal run
+            this = yield
+            run += 1
+            with pytest.raises(GeneratorExit):
+                yield defer(cb, this())
+            yield
+            run += 1
+
+        wrapper = func().with_weak_ref()
+        wait_until_finished(wrapper)
+        assert run == 3
+        assert wrapper.has_terminated()
+
+    def test_close_garbagecollected(self):
+        run = False
+
+        @send_self
+        def func():
+            nonlocal run
+            yield
+            with pytest.raises(GeneratorExit):
+                yield
+            run = True
+
+        wrapper = func().with_weak_ref()
+        wait_until_finished(wrapper)
+        assert run
         assert wrapper.has_terminated()
 
     def test_wait(self):
