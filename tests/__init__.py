@@ -1,21 +1,17 @@
 import threading
 import time
 
+from ..send_self import WeakGeneratorWrapper
 
-from ..send_self import (
-    WeakGeneratorWrapper,
-    StrongGeneratorWrapper
-)
 
-default_sleep = 0.1
+DEFAULT_SLEEP = 0.01
 
 
 class CustomError(Exception):
     pass
 
 
-def defer(callback, *args, sleep=default_sleep, expected_return=None, call=True,
-          **kwargs):
+def defer(callback, *args, sleep=DEFAULT_SLEEP, expected_return=None, call=True, **kwargs):
 
     def func():
         time.sleep(sleep)
@@ -28,15 +24,16 @@ def defer(callback, *args, sleep=default_sleep, expected_return=None, call=True,
     t.start()
 
 
-def wait_until_finished(wrapper, timeout=None, sleep=default_sleep,
-                        defer_calls=1):
-    # Can not be called with StrongGeneratorWrapper, likely because it will be
-    # bound in some frame and thus its reference won't get gc'd when it would
-    # otherwise. TOCHECK
-    assert type(wrapper) is WeakGeneratorWrapper
+def wait_until_finished(wrapper, timeout=1, sleep=DEFAULT_SLEEP, defer_calls=1):
+    # Can not be called with StrongGeneratorWrapper,
+    # likely because it will be bound in some frame
+    # and thus its reference won't get gc'd
+    # when it would otherwise.
+    # TOCHECK
+    # assert type(wrapper) is WeakGeneratorWrapper
 
     if not timeout:
-        timeout = defer_calls * default_sleep + 1
+        timeout = defer_calls * DEFAULT_SLEEP + 1
 
     ref = wrapper.weak_generator
     start_time = time.time()
