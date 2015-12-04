@@ -139,11 +139,17 @@ class TestSendSelfDeferring(object):
                 yield
 
             run = True
-            yield
 
-        wait_until_finished(func().with_weak_ref(), timeout=1)
+        wrapper = func()
+        wait_until_finished(wrapper)
         assert run
-        # TODO test when terminated
+
+        with pytest.raises(RuntimeError):
+            wrapper.next_wait()
+        with pytest.raises(RuntimeError):
+            wrapper.send_wait(1)
+        with pytest.raises(RuntimeError):
+            wrapper.throw_wait(CustomError)
 
     def test_wait_timeout(self):
         run = False

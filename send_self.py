@@ -142,6 +142,8 @@ class WeakGeneratorWrapper(object):
                 try:
                     if self.can_resume():
                         return method(generator, *args, **kwargs)
+                    elif self.has_terminated():
+                        raise RuntimeError("%s has already terminated" % generator)
                 finally:
                     self._lock.release()
 
@@ -189,7 +191,7 @@ class WeakGeneratorWrapper(object):
         but will wait until a thread is paused
         before attempting to resume it.
 
-        Additional information:
+        *Additional* information:
 
         :type timeout float:
         :param timeout:
@@ -200,6 +202,8 @@ class WeakGeneratorWrapper(object):
 
         :raises WaitTimeoutError:
             if the generator has not been paused.
+        :raises RuntimeError:
+            if the generator has already terminated.
         """
         return partial(self._next_wait, self.generator)
 
@@ -279,7 +283,7 @@ class WeakGeneratorWrapper(object):
         but will wait until a thread is paused
         before attempting to resume it.
 
-        Additional information:
+        *Additional* information:
 
         :type timeout float:
         :param timeout:
@@ -290,6 +294,8 @@ class WeakGeneratorWrapper(object):
 
         :raises WaitTimeoutError:
             if the generator has not been paused.
+        :raises RuntimeError:
+            if the generator has already terminated.
         """
         return partial(self._send_wait, self.generator)
 
@@ -374,7 +380,7 @@ class WeakGeneratorWrapper(object):
         but will wait until a thread is paused
         before attempting to resume it.
 
-        Additional information:
+        *Additional* information:
 
         :type timeout float:
         :param timeout:
@@ -385,6 +391,8 @@ class WeakGeneratorWrapper(object):
 
         :raises WaitTimeoutError:
             if the generator has not been paused.
+        :raises RuntimeError:
+            if the generator has already terminated.
         """
         return partial(self._throw_wait, self.generator)
 
