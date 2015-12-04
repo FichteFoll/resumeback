@@ -199,6 +199,25 @@ class TestSendSelfDeferring(object):
         wait_until_finished(func())
         assert run
 
+    def test_wait_timeout2(self):
+        run = False
+        timeouts = range(1, 18, 8)
+
+        @send_self
+        def func(timeout):
+            nonlocal run
+            this = yield
+            start = time.time()
+            with pytest.raises(WaitTimeoutError):
+                this.next_wait(timeout=timeout)
+            assert time.time() - start > timeout
+            run = True
+
+        for timeout in timeouts:
+            wait_until_finished(func(timeout / 100.0))
+            assert run
+            run = False
+
     def test_wait_async(self):
         run = False
 
