@@ -12,14 +12,14 @@ class TestGeneratorWrappers(object):
         def func():
             yield
         generator = func()
-        refs = [StrongGeneratorWrapper(generator),
-                WeakGeneratorWrapper(weakref.ref(generator))]
+        wrappers = [StrongGeneratorWrapper(generator),
+                    WeakGeneratorWrapper(weakref.ref(generator))]
 
-        for ref in refs:
-            assert type(ref.weak_generator) is weakref.ref
-            assert ref.weak_generator() is generator
-            assert ref.catch_stopiteration is True
-            assert ref.debug is False
+        for wrapper in wrappers:
+            assert type(wrapper.weak_generator) is weakref.ref
+            assert wrapper.weak_generator() is generator
+            assert wrapper.catch_stopiteration is True
+            assert wrapper.debug is False
 
     def test_equal(self):
         def func():
@@ -29,6 +29,9 @@ class TestGeneratorWrappers(object):
                 == StrongGeneratorWrapper(generator))
         assert (WeakGeneratorWrapper(weakref.ref(generator))
                 == WeakGeneratorWrapper(weakref.ref(generator)))
+
+        assert (StrongGeneratorWrapper(generator)
+                != WeakGeneratorWrapper(weakref.ref(generator)))
 
     # Also checks preservance of weak_generator object
     def test_with_weak_ref(self):
@@ -121,13 +124,10 @@ class TestGeneratorWrappers(object):
             run = yield defer(cb, this, sleep=0)
             yield
 
-        ref = func2()
+        wrapper = func2()
         time.sleep(0.1)
         assert run
 
-        import inspect
-        print(inspect.getgeneratorstate(ref.generator))
-        print(ref, ref.generator, ref.generator.gi_frame, ref.has_terminated())
-        assert not ref.has_terminated()
-        ref.next()
-        assert ref.has_terminated()
+        assert not wrapper.has_terminated()
+        wrapper.next()
+        assert wrapper.has_terminated()
