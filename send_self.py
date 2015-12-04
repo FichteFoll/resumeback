@@ -1,6 +1,7 @@
 from __future__ import print_function
 
-from functools import partial, wraps
+from collections import abc as c_abc
+from functools import partial, wraps, update_wrapper
 import inspect
 import threading
 import time
@@ -522,8 +523,20 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
     __call__ = with_weak_ref
 
 
-def send_self(catch_stopiteration=True, finalize_callback=None, debug=False,
-              __return_yield=False):
+# Move first argument to a "_func" kwarg if it's callable
+class SendSelfMeta(type):
+    def __call__(cls, *args, **kwargs):
+        if args and callable(args[0]):
+            func, *args = args
+            if args or kwargs:
+                raise TypeError("Invalid usage of send_self")
+        else:
+            func = None
+        return super(SendSelfMeta, cls).__call__(*args, _func=func, **kwargs)
+
+
+class send_self(metaclass=SendSelfMeta):
+
     """Decorator that sends a generator a wrapper of itself.
 
     Can be called with parameters or used as a decorator directly.
@@ -575,46 +588,87 @@ def send_self(catch_stopiteration=True, finalize_callback=None, debug=False,
     :raises TypeError:
         If the parameters are not of types as specified.
     :raises ValueError:
-        If the callable is not a generator
-        or ``finalize_callback`` is not callable.
+        If the callable is not a generator.
 
     :return:
         A :class:`StrongGeneratorWrapper` instance
         holding the created generator.
     """
-    # "catch_stopiteration" needs to be the name of the first parameter. For
-    # clarity, we mirror that to first_param and override catch_stopiteration
-    # later.
-    first_param = catch_stopiteration
-    catch_stopiteration = first_param if not callable(first_param) else True
 
-    # Typechecking
-    type_table = [
-        ('catch_stopiteration', catch_stopiteration, bool),
-        ('debug', debug, bool),
-    ]
-    for name, val, type_ in type_table:
-        if not isinstance(val, type_):
-            raise TypeError("Expected %s for parameter '%s', got %s"
-                            % (type_, name, type(val)))
+    def __init__(self, catch_stopiteration=True, finalize_callback=None, debug=False, _func=None):
+        # Typechecking
+        type_table = [
+            ('catch_stopiteration', bool),
+            ('debug', bool),
+            ('finalize_callback', (c_abc.Callable, type(None)))
+        ]
+        for name, type_ in type_table:
+            val = locals()[name]
+            if not isinstance(val, type_):
+                raise TypeError("Expected %s for parameter '%s', got %s"
+                                % (type_, name, type(val)))
 
-    if finalize_callback is not None and not callable(finalize_callback):
-        raise TypeError("Expected callable type for 'finalize_callback'")
+        if _func and not inspect.isgeneratorfunction(_func):
+            raise ValueError("Callable must be a generatorfunction")
 
-    if callable(first_param):
-        # If the argument is a callable, we've been used without being directly
-        # passed an argument by the user, and thus should call _send_self directly.
-        return _send_self(catch_stopiteration, finalize_callback, debug,
-                          __return_yield, first_param)
-    else:
-        # Someone has called @send_self(...) with parameters and thus we return
-        # _send_self to be called indirectly, as a partial.
-        return partial(_send_self,
-                       catch_stopiteration, finalize_callback, debug,
-                       __return_yield)
+        self.catch_stopiteration = catch_stopiteration
+        self.finalize_callback = finalize_callback
+        self.debug = debug
+        self._func = _func
+
+        # Wrap _func if it was specified
+        if _func:
+            update_wrapper(self, _func)
+
+    def _start_generator(self, generator):
+        # Start generator
+        next(generator)
+
+        # Register finalize_callback to be called when the object is gc'ed
+        weak_generator = weakref.ref(generator, self.finalize_callback)
+
+        # Build wrapper and send to the generator
+        gen_wrapper = StrongGeneratorWrapper(
+            generator,
+            weak_generator,
+            self.catch_stopiteration,
+            self.debug
+        )
+        gen_wrapper.send(gen_wrapper.with_weak_ref())
+        return gen_wrapper
+
+    def __call__(self, *args, **kwargs):
+        # Second part of decorator usage, i.e. `@send_self(True) \n def ...`
+        if not self._func:
+            if not args or not callable(args[0]):
+                raise RuntimeError("send_self wrapper has not properly been initialized yet")
+            else:
+                if not inspect.isgeneratorfunction(args[0]):
+                    raise ValueError("Callable must be a generatorfunction")
+                self._func = args[0]
+                update_wrapper(self, self._func)
+                return self
+
+        # Create generator
+        generator = self._func(*args, **kwargs)
+
+        return self._start_generator(generator)
+
+    def as_subgenerator(self, other_wrapper, *args, **kwargs):
+        """TODO"""
+        # Create generator
+        generator = self._func(*args, **kwargs)
+
+        # Start generator
+        next(generator)
+
+        # Send the "other wrapper" to the new generator
+        generator.send(other_wrapper)
+        return generator
 
 
-def send_self_return(catch_stopiteration=True, finalize_callback=None, debug=False):
+class send_self_return(send_self):
+
     """Decorator that sends a generator a wrapper of itself.
 
     Behaves exactly like :func:`send_self`,
@@ -624,44 +678,20 @@ def send_self_return(catch_stopiteration=True, finalize_callback=None, debug=Fal
     :return:
         The first yielded value of the generator.
     """
-    return send_self(catch_stopiteration, finalize_callback, debug, __return_yield=True)
 
-
-# We either directly call this, or return it to be called by Python's
-# decorator mechanism.
-# Since functools.partial is used, 'func' needs to be at the end.
-def _send_self(catch_stopiteration, finalize_callback, debug, return_yield,
-               func):
-    if not inspect.isgeneratorfunction(func):
-        raise ValueError("Callable must be a generatorfunction")
-
-    @wraps(func)
-    def send_self_wrapper(*args, **kwargs):
-        # optional but for clarity
-        nonlocal catch_stopiteration, finalize_callback, return_yield, debug
-        nonlocal func
-
-        # Create generator
-        generator = func(*args, **kwargs)
+    def _start_generator(self, generator):
+        # The first yielded value will be used as return value of the
+        # "initial call to the generator" (=> this wrapper)
+        ret_value = next(generator)
 
         # Register finalize_callback to be called when the object is gc'ed
-        weak_generator = weakref.ref(generator, finalize_callback)
+        weak_generator = weakref.ref(generator, self.finalize_callback)
 
-        # The first yielded value will be used as return value of the
-        # "initial call to the generator" (=> this wrapper).
-        ret_value = next(generator)  # Start generator
-
-        # Send wrapper to the generator
+        # Build wrapper and send to the generator
         gen_wrapper = WeakGeneratorWrapper(
             weak_generator,
-            catch_stopiteration,
-            debug
+            self.catch_stopiteration,
+            self.debug
         )
         gen_wrapper.send(gen_wrapper)
-
-        if not return_yield:
-            # Return wrapper with strong reference to prevent gc
-            ret_value = gen_wrapper.with_strong_ref()
         return ret_value
-
-    return send_self_wrapper
