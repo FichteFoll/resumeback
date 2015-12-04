@@ -115,7 +115,7 @@ class TestGeneratorWrappers(object):
             assert not this.has_terminated()
             this.send_wait(True)
 
-        @send_self(debug=True)
+        @send_self
         def func2():
             nonlocal run
             this = yield
