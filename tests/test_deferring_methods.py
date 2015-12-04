@@ -9,8 +9,6 @@ from ..send_self import (
 
 from . import CustomError, defer, wait_until_finished
 
-# TODO only gc'd when deferred thread terminates and does not call
-# TODO gc (*_cleanup)
 # TODO subgenerator shit
 
 
@@ -80,7 +78,6 @@ class TestSendSelfDeferring(object):
         assert run
 
     def test_throw_return(self):
-        # TODO split in two (test_throw_cleanup)
         val = 2 + id(self)
 
         @send_self
@@ -93,9 +90,6 @@ class TestSendSelfDeferring(object):
 
         wrapper = func()
         assert val == wrapper.throw(CustomError)
-        wrapper = wrapper.with_weak_ref()  # Allow for gc
-        # gc.collect()  # Not needed
-        assert wrapper.generator is None
 
     def test_close(self):
         run = 0
