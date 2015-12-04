@@ -477,13 +477,9 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
 
     ``__call__`` is an alias for :meth:`with_weak_ref`.
 
-    IMPORTANT:
-    DO NOT BIND AN INSTANCE OF THIS
-    IN THE GENERATOR'S LOCAL SCOPE ITSELF
-    (unless you know what you are doing).
-    Otherwise the generator will not be garbage-collected
-    if it is paused due to a yield
-    and not resumed again.
+    .. note::
+        Binding an instance if this in the generator's scope
+        will create a circular reference.
     """
 
     generator = None  # Override property of WeakGeneratorWrapper
@@ -545,16 +541,12 @@ def send_self(catch_stopiteration=True, finalize_callback=None, debug=False,
     as callback parameters
     and then pausing itself with 'yield'.
 
-    IMPORTANT:
-    DO NOT BIND STRONG REFERENCES TO THE GENERATOR
-    IN THE GENERATOR'S LOCAL SCOPE ITSELF
-    (unless you know what you are doing).
-    Otherwise the generator will not be garbage-collected
-    if it is paused due to a yield
-    and not called again
-    due to a cyclic reference.
-
     See :class:`WeakGeneratorWrapper` for what you can do with it.
+
+    .. note::
+        Binding a strong reference to the generator
+        in the generator's scope itself
+        will create a circular reference.
 
     :type catch_stopiteration: bool
     :param catch_stopiteration:
@@ -627,7 +619,7 @@ def send_self_return(catch_stopiteration=True, finalize_callback=None, debug=Fal
 
     Behaves exactly like :func:`send_self`,
     except that it returns the first yielded value
-    of the generator instead of a wrapper.
+    of the generator instead of a wrapper to it.
 
     :return:
         The first yielded value of the generator.
@@ -668,6 +660,7 @@ def _send_self(catch_stopiteration, finalize_callback, debug, return_yield,
         gen_wrapper.send(gen_wrapper)
 
         if not return_yield:
+            # Return wrapper with strong reference to prevent gc
             ret_value = gen_wrapper.with_strong_ref()
         return ret_value
 

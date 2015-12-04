@@ -1,8 +1,6 @@
 import threading
 import time
 
-from ..send_self import WeakGeneratorWrapper
-
 
 DEFAULT_SLEEP = 0.01
 
@@ -25,13 +23,6 @@ def defer(callback, *args, sleep=DEFAULT_SLEEP, expected_return=None, call=True,
 
 
 def wait_until_finished(wrapper, timeout=1, sleep=DEFAULT_SLEEP, defer_calls=1):
-    # Can not be called with StrongGeneratorWrapper,
-    # likely because it will be bound in some frame
-    # and thus its reference won't get gc'd
-    # when it would otherwise.
-    # TOCHECK
-    # assert type(wrapper) is WeakGeneratorWrapper
-
     if not timeout:
         timeout = defer_calls * DEFAULT_SLEEP + 1
 
