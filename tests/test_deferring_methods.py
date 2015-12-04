@@ -22,7 +22,7 @@ class TestSendSelfDeferring(object):
             yield defer(this.next)
             run = True
 
-        wait_until_finished(func().with_weak_ref(), defer_calls=1)
+        wait_until_finished(func(), defer_calls=1)
         assert run
 
     def test_next_failures(self):
@@ -50,7 +50,7 @@ class TestSendSelfDeferring(object):
             assert (yield defer(this.send)) is None
             run = True
 
-        wait_until_finished(func().with_weak_ref(), defer_calls=1)
+        wait_until_finished(func(), defer_calls=1)
         assert run
 
     def test_throw(self):
@@ -72,7 +72,7 @@ class TestSendSelfDeferring(object):
 
             run = True
 
-        wait_until_finished(func().with_weak_ref(), defer_calls=1)
+        wait_until_finished(func())
         assert run
 
     def test_throw_return(self):
@@ -103,7 +103,6 @@ class TestSendSelfDeferring(object):
         wrapper = func()
         wait_until_finished(wrapper)
         assert run == 1
-        assert wrapper.has_terminated()
 
     def test_close_generatorexit(self):
         run = 0
@@ -128,7 +127,6 @@ class TestSendSelfDeferring(object):
         wrapper = func().with_weak_ref()
         wait_until_finished(wrapper)
         assert run == 3
-        assert wrapper.has_terminated()
 
     def test_close_garbagecollected(self):
         run = False
@@ -144,7 +142,6 @@ class TestSendSelfDeferring(object):
         wrapper = func().with_weak_ref()
         wait_until_finished(wrapper)
         assert run
-        assert wrapper.has_terminated()
 
     def test_wait(self):
         run = False
@@ -199,7 +196,7 @@ class TestSendSelfDeferring(object):
 
             run = True
 
-        wait_until_finished(func().with_weak_ref())
+        wait_until_finished(func())
         assert run
 
     def test_wait_async(self):
@@ -227,7 +224,7 @@ class TestSendSelfDeferring(object):
 
             run = True
 
-        wait_until_finished(func().with_weak_ref())
+        wait_until_finished(func())
         assert run
 
     def test_wait_async_timeout(self):
