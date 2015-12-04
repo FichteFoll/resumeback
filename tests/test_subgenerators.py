@@ -15,7 +15,7 @@ class TestSubgenerators(object):
     def test_subgenerator_next(self):
         run = False
 
-        def sub_generator(this):
+        def subgenerator(this):
             nonlocal run
             yield defer(this.next)
             run = True
@@ -24,7 +24,7 @@ class TestSubgenerators(object):
         def func():
             nonlocal run
             this = yield
-            yield from sub_generator(this)
+            yield from subgenerator(this)
 
         wrapper = func()
         wait_until_finished(wrapper)
@@ -34,7 +34,7 @@ class TestSubgenerators(object):
         run = False
         val = 123 + id(self)
 
-        def sub_generator(this):
+        def subgenerator(this):
             nonlocal run, val
             assert (yield defer(this.send, val)) == val
             run = True
@@ -43,7 +43,7 @@ class TestSubgenerators(object):
         def func():
             nonlocal run
             this = yield
-            yield from sub_generator(this)
+            yield from subgenerator(this)
 
         wrapper = func()
         wait_until_finished(wrapper)
@@ -52,7 +52,7 @@ class TestSubgenerators(object):
     def test_subgenerator_throw(self):
         run = False
 
-        def sub_generator(this):
+        def subgenerator(this):
             nonlocal run
             with pytest.raises(CustomError):
                 yield defer(this.throw, CustomError)
@@ -62,7 +62,7 @@ class TestSubgenerators(object):
         def func():
             nonlocal run
             this = yield
-            yield from sub_generator(this)
+            yield from subgenerator(this)
 
         wrapper = func()
         wait_until_finished(wrapper)
