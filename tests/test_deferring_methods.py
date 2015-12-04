@@ -9,8 +9,6 @@ from ..send_self import (
 
 from . import CustomError, defer, wait_until_finished
 
-# TODO subgenerator shit
-
 
 class TestSendSelfDeferring(object):
 
