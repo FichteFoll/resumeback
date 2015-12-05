@@ -8,3 +8,6 @@
 # coverage
 htmlcov/
 .coverage
+
+# docs
+sphinx_build/
