@@ -2,7 +2,7 @@ import time
 
 import pytest
 
-from ..send_self import (
+from send_self import (
     send_self,
     WaitTimeoutError
 )

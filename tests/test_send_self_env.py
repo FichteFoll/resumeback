@@ -1,6 +1,6 @@
 import pytest
 
-from ..send_self import (
+from send_self import (
     send_self,
     send_self_return,
     WeakGeneratorWrapper,
