@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from collections import abc as c_abc
-from functools import partial, wraps, update_wrapper
+from functools import partial, update_wrapper
 import inspect
 import threading
 import time
@@ -60,7 +60,7 @@ class WeakGeneratorWrapper(object):
 
     .. attribute:: generator
         Strong reference to the generator.
-        Will be retrieved from the :attr:`weak_geenrator` in a property.
+        Will be retrieved from the :attr:`weak_generator` in a property.
 
     .. attribute:: weak_generator
         Instance of ``weakref.ref``
