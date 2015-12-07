@@ -18,7 +18,7 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+# sys.path.insert(0, os.path.abspath('./../..'))  # autodoc
 
 # -- General configuration ------------------------------------------------
 
@@ -54,7 +54,7 @@ copyright = u'2015, FichteFoll'
 # built documents.
 #
 # The short X.Y version.
-version = '0.1.0'
+version = '0.1'
 # The full version, including alpha/beta/rc tags.
 release = '0.1.0'
 
@@ -98,10 +98,28 @@ pygments_style = 'sphinx'
 
 
 # -- Options for HTML output ----------------------------------------------
+#
+import sphinx_readable_theme
+
+html_theme_path = [sphinx_readable_theme.get_html_theme_path()]
+html_theme = 'readable'
+
+# import sphinx_bootstrap_theme
+
+# html_theme = 'bootstrap'
+# html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+
+# html_theme_options = {
+#     'navbar_class': "navbar navbar-inverse",
+#     'bootstrap_version': "3",
+#     'bootswatch_theme': "readable",
+#     'globaltoc_depth': 2,
+#     'navbar_pagenav': False,
+# }
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+# html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
