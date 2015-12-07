@@ -167,6 +167,8 @@ class TestSendSelfEnvironment(object):
             (ValueError, test_yield_parameter, [], {}),
             (ValueError, lambda x: x ** 2, [], {}),
             (ValueError, type, [], {}),
+            # "both" args
+            (TypeError, None, [type, 1], {}),
             # send_self args
             (TypeError, None, [1], {}),
             (TypeError, None, ["str"], {}),
@@ -174,6 +176,10 @@ class TestSendSelfEnvironment(object):
             (TypeError, None, [], {'finalize_callback': 1}),
             (TypeError, None, [], {'finalize_callback': False}),
             (TypeError, None, [], {'debug': 1}),
+            # "delayed" func
+            (TypeError, type, [], {'catch_stopiteration': 1}),
+            (ValueError, type, [], {'catch_stopiteration': True}),
+            (RuntimeError, 1, [], {'catch_stopiteration': True}),
         ]
     )
     def test_bad_arguments(self, error, func, args, kwargs):
