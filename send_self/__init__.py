@@ -1,6 +1,11 @@
 from __future__ import print_function
 
-from collections import abc as c_abc
+import sys
+
+if sys.version_info < (3,):
+    import collections as c_abc
+else:
+    from collections import abc as c_abc
 from functools import partial, update_wrapper
 import inspect
 import threading
@@ -9,12 +14,20 @@ import weakref
 
 
 __all__ = (
-    'StrongGeneratorWrapper',
-    'WaitTimeoutError',
-    'WeakGeneratorWrapper',
     'send_self',
     'send_self_return',
+    'WeakGeneratorWrapper',
+    'StrongGeneratorWrapper',
+    'WaitTimeoutError',
 )
+
+
+# Use this compat method to create a dummy class
+# that other classes can be subclassed from.
+# This allows specifying a metaclass for both Py2 and Py3 with the same syntax.
+def with_metaclass(meta, *bases):
+    """Create a base class with a metaclass (for subclassing)."""
+    return meta("_" + meta.__name__, bases or (object,), {})
 
 
 class WaitTimeoutError(RuntimeError):
@@ -529,7 +542,8 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
 class SendSelfMeta(type):
     def __call__(cls, *args, **kwargs):
         if args and callable(args[0]):
-            func, *args = args
+            func = args[0]
+            args = args[1:]
             if args or kwargs:
                 raise TypeError("Invalid usage of send_self")
         else:
@@ -537,7 +551,7 @@ class SendSelfMeta(type):
         return super(SendSelfMeta, cls).__call__(*args, _func=func, **kwargs)
 
 
-class send_self(metaclass=SendSelfMeta):
+class send_self(with_metaclass(SendSelfMeta)):
 
     """Decorator that sends a generator a wrapper of itself.
 
