@@ -34,7 +34,7 @@ using callback-based interfaces.
 Essentially, it enables *a single line of execution*.
 
 Following is a function that uses an asynchronous callback mechanism
-to signal that user input has been made::
+to signal that user input has been made:
 
 .. code-block:: python
 
@@ -73,7 +73,7 @@ back to our previously defined function ``on_done``
 
 However, using ``send_self``,
 we can do something to *flatten our line of execution*
-by passing a callback to resume execution in our original function::
+by passing a callback to resume execution in our original function:
 
 .. code-block:: python
 
