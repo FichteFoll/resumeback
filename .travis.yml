@@ -4,12 +4,13 @@ language: python
 sudo: false
 
 python:
-  - "3.3" # ST3
-  - "3.4" # ST3
-  - "3.5" # ST3
+  # - "3.3"
+  - "3.4"
+  - "3.5"
 
 install:
-  pip install -r dev-requirements.txt
+  - pip install -r dev-requirements.txt
+  - pip install coveralls
 
 script:
   - flake8 .
