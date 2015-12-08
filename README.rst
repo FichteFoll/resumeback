@@ -1,10 +1,15 @@
 send_self - Easier callback-based interfaces
 ============================================
 
+.. image:: https://travis-ci.org/FichteFoll/send_self.svg?branch=master
+    :target: https://travis-ci.org/FichteFoll/send_self
+
 ``send_self`` is a utility function decorator
 that enables using callback-based interfaces
 in **a single line of execution**
 -- a single function.
+
+Full docs are available here: http://fichtefoll.github.io/send_self/
 
 
 Installation
@@ -27,6 +32,8 @@ Essentially, it enables *a single line of execution*.
 Following is a function that uses an asynchronous callback mechanism
 to signal that user input has been made::
 
+.. code-block:: python
+
    from threading import Thread
 
    def ask_for_user_input(question, on_done):
@@ -41,7 +48,9 @@ to define a function of some way,
 either as a closure or using ``functools.partial`` so that we can preserve
 the state we already accumulated prior to executing said function.
 
-For example like so::
+For example like so:
+
+.. code-block:: python
 
    def main():
        arbitrary_value = 10
@@ -62,6 +71,8 @@ However, using ``send_self``,
 we can do something to *flatten our line of execution*
 by passing a callback to resume execution in our original function::
 
+.. code-block:: python
+
    from send_self import send_self
 
    @send_self
@@ -79,7 +90,7 @@ by passing a callback to resume execution in our original function::
 Acknowledgements
 ================
 
-Project started initially after a `forum post`__ from `@Varriount`__ 
+Project started initially after a `forum post`__ from `@Varriount`__
 on the Sublime Text forum.
 I just took his idea "to the next (abstraction) level"
 and made it more convenient to use.
