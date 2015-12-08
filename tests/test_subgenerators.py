@@ -1,11 +1,6 @@
-import time
-
 import pytest
 
-from send_self import (
-    send_self,
-    WaitTimeoutError
-)
+from send_self import send_self
 
 from . import CustomError, defer, wait_until_finished
 
