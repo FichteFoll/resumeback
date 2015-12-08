@@ -6,9 +6,9 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to send_self’s documentation! &mdash; send_self 0.1.0 documentation</title>
+    <title>Introduction &mdash; send_self 0.1.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -23,15 +23,27 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="send_self 0.1.0 documentation" href="#" /> 
+    <link rel="top" title="send_self 0.1.0 documentation" href="#" />
+    <link rel="next" title="Introduction" href="" />
+   
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
   </head>
   <body>
+  
+  
+  <div class="indexwrapper">
+  
+
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="#" title="Introduction"
+             accesskey="N">next</a> |</li>
         <li><a href="#">send_self 0.1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -41,21 +53,132 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="welcome-to-send-self-s-documentation">
-<h1>Welcome to send_self&#8217;s documentation!<a class="headerlink" href="#welcome-to-send-self-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Contents:</p>
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">send_self</span></tt> is a utility function decorator
+that enables using callback-based interfaces
+in <strong>a single line of execution</strong>
+&#8211; a single function.</p>
 <div class="toctree-wrapper compound">
-<ul class="simple">
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-it-works">How it works</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#code">Code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference.html#send-self">&#64;send_self</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html#wrappers">Wrappers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html#exceptions">Exceptions</a></li>
+</ul>
+</li>
 </ul>
 </div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-shell"><div class="highlight"><pre><span class="nv">$ </span>pip install send_self
+</pre></div>
 </div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
-<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
-<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
-</ul>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>send_self&#8217;s mechanic of sending a generator function
+a handle to itself
+is what allows for better flow control
+using callback-based interfaces.
+Essentially, it enables <em>a single line of execution</em>.</p>
+<p>Following is a function that uses an asynchronous callback mechanism
+to signal that user input has been made:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+
+<span class="k">def</span> <span class="nf">ask_for_user_input</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">on_done</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">watcher</span><span class="p">():</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+        <span class="n">on_done</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+    <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">watcher</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <em>traditional</em> way of using a function like <tt class="docutils literal"><span class="pre">ask_for_user_input</span></tt> would be
+to define a function of some way,
+either as a clojure or using <tt class="docutils literal"><span class="pre">functools.partial</span></tt> so that we can preserve
+the state we already accumulated prior to executing said function.</p>
+<p>For example like so:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">arbitrary_value</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="k">def</span> <span class="nf">on_done</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+        <span class="n">number</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Result:&quot;</span><span class="p">,</span> <span class="n">number</span> <span class="o">*</span> <span class="n">arbitrary_value</span><span class="p">)</span>
+
+    <span class="n">ask_for_user_input</span><span class="p">(</span><span class="s">&quot;Please enter a number&quot;</span><span class="p">,</span> <span class="n">on_done</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Because Python does not have multi-line inline functions,
+this is rather awkward,
+because we are jumping from the function call of <tt class="docutils literal"><span class="pre">ask_for_user_input</span></tt>
+back to our previously defined function <tt class="docutils literal"><span class="pre">on_done</span></tt>
+&#8211; which is only ever going to be called once in this context.</p>
+<p>However, using <tt class="docutils literal"><span class="pre">send_self</span></tt>,
+we can do something to <em>flatten our line of execution</em>
+by passing a callback to resume execution in our original function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">send_self</span> <span class="kn">import</span> <span class="n">send_self</span>
+
+<span class="nd">@send_self</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">this</span> <span class="o">=</span> <span class="k">yield</span>  <span class="c"># &quot;this&quot; is now a reference to the just-created generator</span>
+    <span class="n">arbitrary_value</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="c"># Yield pauses execution until one of the generator methods is called,</span>
+    <span class="c"># such as `.send`, which we provide as the callback parameter.</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">ask_for_user_input</span><span class="p">(</span><span class="s">&quot;Please enter a number&quot;</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">send</span><span class="p">)</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Result:&quot;</span><span class="p">,</span> <span class="n">number</span> <span class="o">*</span> <span class="n">arbitrary_value</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">send_self</span></tt> operates on generators and their possibility of sending
+arbitrary data to them whereever they paused execution.
+Upon calling a generator function decorated with <tt class="docutils literal"><span class="pre">&#64;send_self</span></tt>,
+it is executed until the first <tt class="docutils literal"><span class="pre">yield</span></tt> statement.
+Immediately following,
+the generator gets sent a wrapper to itself so it may delegate its execution
+environment however it wishes.</p>
+<p>Generators in Python provide four methods for interacting with them:</p>
+<ol class="arabic simple">
+<li>next &#8211; to just resume execution
+(this is available on Python 3 via <tt class="docutils literal"><span class="pre">next(generator)</span></tt>)</li>
+<li>send &#8211; to resume execution and additionally send any value to it</li>
+<li>throw &#8211; to raise an exception at the position the generator paused</li>
+<li>close &#8211; to close the generator</li>
+</ol>
+<p>For the first three methods,
+the wrapper additionally defines <tt class="docutils literal"><span class="pre">*_wait</span></tt> method variants,
+which will block execution until the generator can actually be resumed,
+and <tt class="docutils literal"><span class="pre">*_wait_async</span></tt> variants to also wait until the generator can be resumed,
+but do so in a non-blocking way.</p>
+<p>Additionally,
+the wrapper catches <tt class="docutils literal"><span class="pre">StopIteration</span></tt> exceptions in these three methods,
+so that termination of the generator
+(due to returning a value or just reaching the end)
+does not raise an exception in the caller&#8217;s code,
+which is most likely a function like <tt class="docutils literal"><span class="pre">ask_for_user_input</span></tt>.
+You can disable this whenever you want.</p>
+<p>And finally,
+the wrapper contains a weak reference to the generator,
+which prevents reference cycles
+due to the generator not holding a reference to itself.
+This is but an optimization.</p>
+</div>
+<div class="section" id="code">
+<h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<p>The code is available on github: <a class="reference external" href="https://github.com/FichteFoll/send_self">https://github.com/FichteFoll/send_self</a></p>
+</div>
 </div>
 
 
@@ -66,10 +189,20 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to send_self&#8217;s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#how-it-works">How it works</a></li>
+<li><a class="reference internal" href="#code">Code</a></li>
 </ul>
-
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation index</a><ul>
+      <li>Next: <a href="" title="next chapter">Introduction</a></li>
+  </ul></li>
+</ul>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/index.txt"
@@ -92,18 +225,12 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li><a href="#">send_self 0.1.0 documentation</a> &raquo;</li> 
-      </ul>
-    </div>
-    <div class="footer">
-        &copy; Copyright 2015, FichteFoll.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
+  <div class="footer">
+    &copy; Copyright 2015, FichteFoll.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+  </div>
+  
+  </div>
+  
   </body>
 </html>
