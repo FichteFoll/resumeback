@@ -258,7 +258,10 @@ class TestSendSelfDeferring(object):
             t2 = this.send_wait_async(1, timeout=0.01)
             t3 = this.throw_wait_async(RuntimeError, timeout=0.01)
 
-            time.sleep(0.1)
+            timeout = 0.3
+            t1.join(timeout)
+            t2.join(timeout)
+            t3.join(timeout)
             assert not t1.is_alive()
             assert not t2.is_alive()
             assert not t3.is_alive()
