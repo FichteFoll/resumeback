@@ -1,6 +1,6 @@
-=========
-Reference
-=========
+===========
+ Reference
+===========
 
 
 ``@send_self`` decorator

@@ -1,5 +1,6 @@
-resumeback - Easier callback-based interfaces
-============================================
+===============================================
+ resumeback - Easier callback-based interfaces
+===============================================
 
 .. image:: https://travis-ci.org/FichteFoll/resumeback.svg?branch=master
    :target: https://travis-ci.org/FichteFoll/resumeback
