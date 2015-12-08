@@ -1,0 +1,23 @@
+language: python
+
+# Run on container-based infrastructure
+sudo: false
+
+python:
+  - "3.3" # ST3
+  - "3.4" # ST3
+  - "3.5" # ST3
+
+install:
+  pip install -r dev-requirements.txt
+
+script:
+  - flake8 .
+  - >
+    py.test tests/
+    --cov-config .coveragerc
+    --cov .
+    --cov-report term-missing
+
+after_success:
+  - coveralls
