@@ -44,7 +44,7 @@ to signal that user input has been made::
 
 The *traditional* way of using a function like ``ask_for_user_input`` would be
 to define a function of some way,
-either as a clojure or using ``functools.partial`` so that we can preserve
+either as a closure or using ``functools.partial`` so that we can preserve
 the state we already accumulated prior to executing said function.
 
 For example like so::
