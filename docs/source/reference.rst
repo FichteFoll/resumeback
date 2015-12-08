@@ -2,8 +2,11 @@
 Reference
 =========
 
-@send_self
-==========
+
+``@send_self`` decorator
+========================
+
+.. currentmodule:: resumeback
 
 .. decorator:: send_self
 .. decorator:: send_self(catch_stopiteration=True, finalize_callback=None, debug=False)
