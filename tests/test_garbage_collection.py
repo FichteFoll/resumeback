@@ -2,7 +2,7 @@ import gc
 
 import pytest
 
-from send_self import send_self
+from resumeback import send_self
 
 from . import defer, wait_until_finished
 

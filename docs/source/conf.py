@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# send_self documentation build configuration file, created by
+# resumeback documentation build configuration file, created by
 # sphinx-quickstart on Sat Dec 05 02:55:24 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -46,7 +46,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'send_self'
+project = u'resumeback'
 copyright = u'2015, FichteFoll'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -197,7 +197,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'send_selfdoc'
+htmlhelp_basename = 'resumebackdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -217,7 +217,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'send_self.tex', u'send\\_self Documentation',
+  ('index', 'resumeback.tex', u'resumeback Documentation',
    u'FichteFoll', 'manual'),
 ]
 
@@ -247,7 +247,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'send_self', u'send_self Documentation',
+    ('index', 'resumeback', u'resumeback Documentation',
      [u'FichteFoll'], 1)
 ]
 
@@ -261,8 +261,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'send_self', u'send_self Documentation',
-   u'FichteFoll', 'send_self', 'One line description of project.',
+  ('index', 'resumeback', u'resumeback Documentation',
+   u'FichteFoll', 'resumeback', 'One line description of project.',
    'Miscellaneous'),
 ]
 

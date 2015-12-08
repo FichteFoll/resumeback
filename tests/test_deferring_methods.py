@@ -2,7 +2,7 @@ import time
 
 import pytest
 
-from send_self import (
+from resumeback import (
     send_self,
     WaitTimeoutError
 )

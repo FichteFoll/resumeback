@@ -1,6 +1,6 @@
 import pytest
 
-from send_self import send_self
+from resumeback import send_self
 
 from . import CustomError, defer, wait_until_finished
 

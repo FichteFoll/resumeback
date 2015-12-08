@@ -1,19 +1,19 @@
-send_self - Easier callback-based interfaces
+resumeback - Easier callback-based interfaces
 ============================================
 
-.. image:: https://travis-ci.org/FichteFoll/send_self.svg?branch=master
-   :target: https://travis-ci.org/FichteFoll/send_self
+.. image:: https://travis-ci.org/FichteFoll/resumeback.svg?branch=master
+   :target: https://travis-ci.org/FichteFoll/resumeback
 
-.. image:: https://coveralls.io/repos/FichteFoll/send_self/badge.svg?branch=master&service=github
-   :target: https://coveralls.io/github/FichteFoll/send_self?branch=master
+.. image:: https://coveralls.io/repos/FichteFoll/resumeback/badge.svg?branch=master&service=github
+   :target: https://coveralls.io/github/FichteFoll/resumeback?branch=master
 
 
-``send_self`` is a utility function decorator
+``resumeback`` provides a utility function decorator
 that enables using callback-based interfaces
 in **a single line of execution**
 -- a single function.
 
-Full docs are available here: http://fichtefoll.github.io/send_self/
+Full docs are available here: http://fichtefoll.github.io/resumeback/
 
 
 Installation
@@ -21,13 +21,13 @@ Installation
 
 .. code-block:: shell
 
-    $ pip install send_self
+    $ pip install resumeback
 
 
 Usage
 =====
 
-send_self's mechanic of sending a generator function
+``resumeback.send_self``'s mechanic of sending a generator function
 a handle to itself
 is what allows for better flow control
 using callback-based interfaces.
@@ -71,13 +71,13 @@ because we are jumping from the function call of ``ask_for_user_input``
 back to our previously defined function ``on_done``
 -- which is only ever going to be called once in this context.
 
-However, using ``send_self``,
+However, using ``resumeback.send_self``,
 we can do something to *flatten our line of execution*
 by passing a callback to resume execution in our original function:
 
 .. code-block:: python
 
-   from send_self import send_self
+   from resumeback import send_self
 
    @send_self
    def main():

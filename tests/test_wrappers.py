@@ -1,7 +1,7 @@
 import time
 import weakref
 
-from send_self import send_self, StrongGeneratorWrapper, WeakGeneratorWrapper
+from resumeback import send_self, StrongGeneratorWrapper, WeakGeneratorWrapper
 
 from . import defer
 
