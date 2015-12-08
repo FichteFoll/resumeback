@@ -2,7 +2,11 @@ send_self - Easier callback-based interfaces
 ============================================
 
 .. image:: https://travis-ci.org/FichteFoll/send_self.svg?branch=master
-    :target: https://travis-ci.org/FichteFoll/send_self
+   :target: https://travis-ci.org/FichteFoll/send_self
+
+.. image:: https://coveralls.io/repos/FichteFoll/send_self/badge.svg?branch=master&service=github
+   :target: https://coveralls.io/github/FichteFoll/send_self?branch=master
+
 
 ``send_self`` is a utility function decorator
 that enables using callback-based interfaces
