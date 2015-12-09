@@ -12,12 +12,12 @@ python:
 
 matrix:
   include:
-    - env: RUN_FLAKE8=1
+    - env: RUN_FLAKE8
       python: "3.5"
 
 install:
   - >-
-    if [ -n $RUN_FLAKE8 ];
+    if [[ -n ${RUN_FLAKE8+x} ]];
     then
       pip install flake8>=2.5.0;
     else
@@ -27,7 +27,7 @@ install:
 
 script:
   - >-
-    if [ -n $RUN_FLAKE8 ];
+    if [[ -n ${RUN_FLAKE8+x} ]];
     then
       flake8 .;
     else
@@ -38,4 +38,4 @@ script:
     fi
 
 after_success:
-  - '[ -z $RUN_FLAKE8 ] && coveralls'
+  - '[[ -z ${RUN_FLAKE8+x} ]] && coveralls'
