@@ -1,6 +1,6 @@
-===============================================
- resumeback - Easier callback-based interfaces
-===============================================
+==================================================
+ resumeback - Using callbacks to resume your code
+==================================================
 
 .. image:: https://travis-ci.org/FichteFoll/resumeback.svg?branch=master
    :target: https://travis-ci.org/FichteFoll/resumeback
