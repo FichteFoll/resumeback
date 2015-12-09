@@ -12,7 +12,7 @@ python:
 
 matrix:
   include:
-    - env: RUN_FLAKE8
+    - env: RUN_FLAKE8=1
       python: "3.5"
 
 install:
