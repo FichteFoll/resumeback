@@ -40,7 +40,7 @@ class TestSendSelfEnvironment(object):
     def test_wrapping(self):
         def func():
             """generic docstring"""
-            yield
+            yield  # pragma: no cover
 
         attributes = ["__%s__" % a
                       for a in 'doc,name,module,annotations'.split(',')]

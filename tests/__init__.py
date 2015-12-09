@@ -38,9 +38,15 @@ def wait_until_finished(wrapper, timeout=1, sleep=DEFAULT_SLEEP):
 
 
 class State(object):
+
+    """Helper class to keep track of a test's state."""
+
     def __init__(self):
-        self.counter = 0
-        self.run = False
+        self.reset()
 
     def inc(self):
         self.counter += 1
+
+    def reset(self):
+        self.counter = 0
+        self.run = False

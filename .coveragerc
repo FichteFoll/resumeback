@@ -8,5 +8,8 @@ exclude_lines =
   # Have to re-enable the standard pragma
   pragma: no cover
 
-  # Don't complain about missing debug-only code:
-  # def __repr__
+  # Code that is supposed to fail does not need coverage testing
+  pytest.fail
+
+  # This line is only ever used to make tests fail
+  ts.run = False

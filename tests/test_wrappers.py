@@ -12,7 +12,7 @@ class TestGeneratorWrappers(object):
 
     def test_constructors(self):
         def func():
-            yield
+            yield  # pragma: no cover
         generator = func()
         wrappers = [StrongGeneratorWrapper(generator),
                     WeakGeneratorWrapper(weakref.ref(generator))]
@@ -25,7 +25,7 @@ class TestGeneratorWrappers(object):
 
     def test_equal(self):
         def func():
-            yield
+            yield  # pragma: no cover
         generator = func()
         assert (StrongGeneratorWrapper(generator)
                 == StrongGeneratorWrapper(generator))
@@ -107,7 +107,7 @@ class TestGeneratorWrappers(object):
 
         assert func().has_terminated()
         assert ts.run
-        ts.run = False
+        ts.reset()
 
         def cb(this):
             assert not this.has_terminated()
