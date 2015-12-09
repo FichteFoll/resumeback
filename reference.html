@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Reference &mdash; send_self 0.1.0 documentation</title>
+    <title>Reference &mdash; resumeback 0.1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="send_self 0.1.0 documentation" href="index.html" />
+    <link rel="top" title="resumeback 0.1.0 documentation" href="index.html" />
     <link rel="prev" title="Reference" href="" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="#" title="Reference"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">send_self 0.1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">resumeback 0.1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -53,22 +53,22 @@
             
   <div class="section" id="reference">
 <h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="send-self">
-<h2>&#64;send_self<a class="headerlink" href="#send-self" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="send-self-decorator">
+<h2><tt class="docutils literal"><span class="pre">&#64;send_self</span></tt> decorator<a class="headerlink" href="#send-self-decorator" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="send_self">
-<tt class="descclassname">&#64;</tt><tt class="descname">send_self</tt><a class="headerlink" href="#send_self" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.send_self">
+<tt class="descclassname">&#64;</tt><tt class="descclassname">resumeback.</tt><tt class="descname">send_self</tt><a class="headerlink" href="#resumeback.send_self" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt>
-<tt class="descclassname">&#64;</tt><tt class="descname">send_self</tt><big>(</big><em>catch_stopiteration=True</em>, <em>finalize_callback=None</em>, <em>debug=False</em><big>)</big></dt>
+<tt class="descclassname">&#64;</tt><tt class="descclassname">resumeback.</tt><tt class="descname">send_self</tt><big>(</big><em>catch_stopiteration=True</em>, <em>finalize_callback=None</em>, <em>debug=False</em><big>)</big></dt>
 <dd><p>Decorator that sends a &#8220;generatorfunction&#8221; a wrapper of itself.</p>
 <p>Can be called with parameters or used as a decorator directly.</p>
 <p>When a generator decorated by this is called,
 it gets sent a wrapper of itself
 via the first &#8216;yield&#8217; used.
-The wrapper is an instance of <a class="reference internal" href="#WeakGeneratorWrapper" title="WeakGeneratorWrapper"><tt class="xref py py-class docutils literal"><span class="pre">WeakGeneratorWrapper</span></tt></a>.
+The wrapper is an instance of <a class="reference internal" href="#resumeback.WeakGeneratorWrapper" title="resumeback.WeakGeneratorWrapper"><tt class="xref py py-class docutils literal"><span class="pre">WeakGeneratorWrapper</span></tt></a>.
 The function then returns said wrapper.</p>
 <p>Useful for creating generators
 that can leverage callback-based functions
@@ -105,7 +105,7 @@ Forwarded to the Wrapper.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A <a class="reference internal" href="#StrongGeneratorWrapper" title="StrongGeneratorWrapper"><tt class="xref py py-class docutils literal"><span class="pre">StrongGeneratorWrapper</span></tt></a> instance
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A <a class="reference internal" href="#resumeback.StrongGeneratorWrapper" title="resumeback.StrongGeneratorWrapper"><tt class="xref py py-class docutils literal"><span class="pre">StrongGeneratorWrapper</span></tt></a> instance
 holding the created generator.</p>
 </td>
 </tr>
@@ -120,15 +120,15 @@ holding the created generator.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="send_self_return">
-<tt class="descclassname">&#64;</tt><tt class="descname">send_self_return</tt><a class="headerlink" href="#send_self_return" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.send_self_return">
+<tt class="descclassname">&#64;</tt><tt class="descclassname">resumeback.</tt><tt class="descname">send_self_return</tt><a class="headerlink" href="#resumeback.send_self_return" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt>
-<tt class="descclassname">&#64;</tt><tt class="descname">send_self_return</tt><big>(</big><em>catch_stopiteration=True</em>, <em>finalize_callback=None</em>, <em>debug=False</em><big>)</big></dt>
+<tt class="descclassname">&#64;</tt><tt class="descclassname">resumeback.</tt><tt class="descname">send_self_return</tt><big>(</big><em>catch_stopiteration=True</em>, <em>finalize_callback=None</em>, <em>debug=False</em><big>)</big></dt>
 <dd><p>Decorator that sends a &#8220;generatorfunction&#8221; a wrapper of itself.</p>
-<p>Behaves exactly like <a class="reference internal" href="#send_self" title="send_self"><tt class="xref py py-func docutils literal"><span class="pre">send_self()</span></tt></a>,
+<p>Behaves exactly like <a class="reference internal" href="#resumeback.send_self" title="resumeback.send_self"><tt class="xref py py-func docutils literal"><span class="pre">send_self()</span></tt></a>,
 except that it returns the first yielded value
 of the generator instead of a wrapper to it.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -145,12 +145,12 @@ of the generator instead of a wrapper to it.</p>
 <div class="section" id="wrappers">
 <h2>Wrappers<a class="headerlink" href="#wrappers" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="WeakGeneratorWrapper">
-<em class="property">class </em><tt class="descname">WeakGeneratorWrapper</tt><big>(</big><em>weak_generator</em>, <em>catch_stopiteration=True</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper">
+<em class="property">class </em><tt class="descclassname">resumeback.</tt><tt class="descname">WeakGeneratorWrapper</tt><big>(</big><em>weak_generator</em>, <em>catch_stopiteration=True</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wraps a weak reference to a generator and adds convenience features.</p>
 <p>Generally behaves like a normal generator
 in terms of the four methods
-<a class="reference internal" href="#WeakGeneratorWrapper.send" title="WeakGeneratorWrapper.send"><tt class="xref py py-meth docutils literal"><span class="pre">send()</span></tt></a>, <a class="reference internal" href="#WeakGeneratorWrapper.throw" title="WeakGeneratorWrapper.throw"><tt class="xref py py-meth docutils literal"><span class="pre">throw()</span></tt></a>, <a class="reference internal" href="#WeakGeneratorWrapper.close" title="WeakGeneratorWrapper.close"><tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt></a> and <a class="reference internal" href="#WeakGeneratorWrapper.next" title="WeakGeneratorWrapper.next"><tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt></a>
+<a class="reference internal" href="#resumeback.WeakGeneratorWrapper.send" title="resumeback.WeakGeneratorWrapper.send"><tt class="xref py py-meth docutils literal"><span class="pre">send()</span></tt></a>, <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.throw" title="resumeback.WeakGeneratorWrapper.throw"><tt class="xref py py-meth docutils literal"><span class="pre">throw()</span></tt></a>, <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.close" title="resumeback.WeakGeneratorWrapper.close"><tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt></a> and <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.next" title="resumeback.WeakGeneratorWrapper.next"><tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt></a>
 (or with the global <tt class="docutils literal"><span class="pre">next</span></tt> funtion),
 but has the following convenience features:</p>
 <ol class="arabic simple">
@@ -161,16 +161,16 @@ from within the generator
 without causing it to get garbage-collected.
 Usually the reference count decreases (possibly to 0)
 when the generator pauses.</li>
-<li>The <a class="reference internal" href="#WeakGeneratorWrapper.send" title="WeakGeneratorWrapper.send"><tt class="xref py py-meth docutils literal"><span class="pre">send()</span></tt></a> method has a default value
+<li>The <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.send" title="resumeback.WeakGeneratorWrapper.send"><tt class="xref py py-meth docutils literal"><span class="pre">send()</span></tt></a> method has a default value
 for its <tt class="docutils literal"><span class="pre">value</span></tt> parameter.
 This allows it to be used without a parameter,
 where it will behave like <cite>next(generator)</cite>,
 unlike the default implementation of send.</li>
-<li>The methods <a class="reference internal" href="#WeakGeneratorWrapper.send" title="WeakGeneratorWrapper.send"><tt class="xref py py-meth docutils literal"><span class="pre">send()</span></tt></a> and <a class="reference internal" href="#WeakGeneratorWrapper.throw" title="WeakGeneratorWrapper.throw"><tt class="xref py py-meth docutils literal"><span class="pre">throw()</span></tt></a>
+<li>The methods <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.send" title="resumeback.WeakGeneratorWrapper.send"><tt class="xref py py-meth docutils literal"><span class="pre">send()</span></tt></a> and <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.throw" title="resumeback.WeakGeneratorWrapper.throw"><tt class="xref py py-meth docutils literal"><span class="pre">throw()</span></tt></a>
 optionally catch <tt class="docutils literal"><span class="pre">StopIteration</span></tt> exceptions
 so that they are not propagated to the caller
 when the generator terminates.</li>
-<li><a class="reference internal" href="#WeakGeneratorWrapper.with_strong_ref" title="WeakGeneratorWrapper.with_strong_ref"><tt class="xref py py-meth docutils literal"><span class="pre">with_strong_ref()</span></tt></a> (= <a class="reference internal" href="#WeakGeneratorWrapper.__call__" title="WeakGeneratorWrapper.__call__"><tt class="xref py py-meth docutils literal"><span class="pre">__call__()</span></tt></a>)
+<li><a class="reference internal" href="#resumeback.WeakGeneratorWrapper.with_strong_ref" title="resumeback.WeakGeneratorWrapper.with_strong_ref"><tt class="xref py py-meth docutils literal"><span class="pre">with_strong_ref()</span></tt></a> (= <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.__call__" title="resumeback.WeakGeneratorWrapper.__call__"><tt class="xref py py-meth docutils literal"><span class="pre">__call__()</span></tt></a>)
 will return a wrapper
 with a strong reference to the generator.
 This allows you to pass
@@ -198,34 +198,34 @@ On Python &gt;3.3 its value will be returned if available,
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="WeakGeneratorWrapper.generator">
-<tt class="descname">generator</tt><a class="headerlink" href="#WeakGeneratorWrapper.generator" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.generator">
+<tt class="descname">generator</tt><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.generator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Strong reference to the generator.
-Will be retrieved from <a class="reference internal" href="#WeakGeneratorWrapper.weak_generator" title="WeakGeneratorWrapper.weak_generator"><tt class="xref py py-attr docutils literal"><span class="pre">weak_generator</span></tt></a> in a property.</p>
+Will be retrieved from <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.weak_generator" title="resumeback.WeakGeneratorWrapper.weak_generator"><tt class="xref py py-attr docutils literal"><span class="pre">weak_generator</span></tt></a> in a property.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="WeakGeneratorWrapper.weak_generator">
-<tt class="descname">weak_generator</tt><a class="headerlink" href="#WeakGeneratorWrapper.weak_generator" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.weak_generator">
+<tt class="descname">weak_generator</tt><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.weak_generator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instance of <tt class="docutils literal"><span class="pre">weakref.ref</span></tt>
 and weak reference to the generator</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="WeakGeneratorWrapper.catch_stopiteration">
-<tt class="descname">catch_stopiteration</tt><a class="headerlink" href="#WeakGeneratorWrapper.catch_stopiteration" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.catch_stopiteration">
+<tt class="descname">catch_stopiteration</tt><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.catch_stopiteration" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="WeakGeneratorWrapper.debug">
-<tt class="descname">debug</tt><a class="headerlink" href="#WeakGeneratorWrapper.debug" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.debug">
+<tt class="descname">debug</tt><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.debug" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.next">
-<tt class="descname">next</tt><big>(</big><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.next" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.next">
+<tt class="descname">next</tt><big>(</big><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resume the generator.</p>
-<p>Depending on <a class="reference internal" href="#WeakGeneratorWrapper.catch_stopiteration" title="WeakGeneratorWrapper.catch_stopiteration"><tt class="xref py py-attr docutils literal"><span class="pre">catch_stopiteration</span></tt></a>,
+<p>Depending on <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.catch_stopiteration" title="resumeback.WeakGeneratorWrapper.catch_stopiteration"><tt class="xref py py-attr docutils literal"><span class="pre">catch_stopiteration</span></tt></a>,
 <tt class="docutils literal"><span class="pre">StopIteration</span></tt> exceptions will be caught
 and their values returned instead,
 if any.</p>
@@ -245,22 +245,22 @@ Python&gt;3.3).</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.with_strong_ref">
-<tt class="descname">with_strong_ref</tt><big>(</big><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.with_strong_ref" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a <a class="reference internal" href="#StrongGeneratorWrapper" title="StrongGeneratorWrapper"><tt class="xref py py-class docutils literal"><span class="pre">StrongGeneratorWrapper</span></tt></a> with the same attributes.</p>
+<dt id="resumeback.WeakGeneratorWrapper.with_strong_ref">
+<tt class="descname">with_strong_ref</tt><big>(</big><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.with_strong_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a <a class="reference internal" href="#resumeback.StrongGeneratorWrapper" title="resumeback.StrongGeneratorWrapper"><tt class="xref py py-class docutils literal"><span class="pre">StrongGeneratorWrapper</span></tt></a> with the same attributes.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.with_weak_ref">
-<tt class="descname">with_weak_ref</tt><big>(</big><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.with_weak_ref" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a <a class="reference internal" href="#WeakGeneratorWrapper" title="WeakGeneratorWrapper"><tt class="xref py py-class docutils literal"><span class="pre">WeakGeneratorWrapper</span></tt></a> with the same attributes.</p>
+<dt id="resumeback.WeakGeneratorWrapper.with_weak_ref">
+<tt class="descname">with_weak_ref</tt><big>(</big><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.with_weak_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a <a class="reference internal" href="#resumeback.WeakGeneratorWrapper" title="resumeback.WeakGeneratorWrapper"><tt class="xref py py-class docutils literal"><span class="pre">WeakGeneratorWrapper</span></tt></a> with the same attributes.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.next_wait">
-<tt class="descname">next_wait</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.next_wait" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.next_wait">
+<tt class="descname">next_wait</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.next_wait" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wait before nexting a value to the generator to resume it.</p>
-<p>Generally works like <a class="reference internal" href="#WeakGeneratorWrapper.next" title="WeakGeneratorWrapper.next"><tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt></a>,
+<p>Generally works like <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.next" title="resumeback.WeakGeneratorWrapper.next"><tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt></a>,
 but will wait until a thread is paused
 before attempting to resume it.</p>
 <p><em>Additional</em> information:</p>
@@ -275,7 +275,7 @@ for <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference internal" href="#WaitTimeoutError" title="WaitTimeoutError"><strong>WaitTimeoutError</strong></a> &#8211; if the generator has not paused in time.</li>
+<li><strong>WaitTimeoutError</strong> &#8211; if the generator has not paused in time.</li>
 <li><strong>RuntimeError</strong> &#8211; if the generator has already terminated.</li>
 </ul>
 </td>
@@ -285,12 +285,12 @@ for <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.next_wait_async">
-<tt class="descname">next_wait_async</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.next_wait_async" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.next_wait_async">
+<tt class="descname">next_wait_async</tt><big>(</big><em>timeout=None</em><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.next_wait_async" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a waiting daemon thread to resume the generator.</p>
-<p>Works like <a class="reference internal" href="#WeakGeneratorWrapper.next_wait" title="WeakGeneratorWrapper.next_wait"><tt class="xref py py-meth docutils literal"><span class="pre">next_wait()</span></tt></a>
+<p>Works like <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.next_wait" title="resumeback.WeakGeneratorWrapper.next_wait"><tt class="xref py py-meth docutils literal"><span class="pre">next_wait()</span></tt></a>
 but does it asynchronously.
-The thread spawned raises <a class="reference internal" href="#WaitTimeoutError" title="WaitTimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">WaitTimeoutError</span></tt></a>
+The thread spawned raises <a class="reference internal" href="#resumeback.WaitTimeoutError" title="resumeback.WaitTimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">WaitTimeoutError</span></tt></a>
 when it times out.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -305,10 +305,10 @@ when it times out.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.send">
-<tt class="descname">send</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.send" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.send">
+<tt class="descname">send</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a value to the generator to resume it.</p>
-<p>Depending on <a class="reference internal" href="#WeakGeneratorWrapper.catch_stopiteration" title="WeakGeneratorWrapper.catch_stopiteration"><tt class="xref py py-attr docutils literal"><span class="pre">catch_stopiteration</span></tt></a>,
+<p>Depending on <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.catch_stopiteration" title="resumeback.WeakGeneratorWrapper.catch_stopiteration"><tt class="xref py py-attr docutils literal"><span class="pre">catch_stopiteration</span></tt></a>,
 <tt class="docutils literal"><span class="pre">StopIteration</span></tt> exceptions will be caught
 and their values returned instead,
 if any.</p>
@@ -319,7 +319,7 @@ if any.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> &#8211; The value to send to the generator.
 Default is <tt class="docutils literal"><span class="pre">None</span></tt>,
 which results in the same behavior
-as calling <a class="reference internal" href="#WeakGeneratorWrapper.next" title="WeakGeneratorWrapper.next"><tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt></a>
+as calling <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.next" title="resumeback.WeakGeneratorWrapper.next"><tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt></a>
 or using the global &#8216;next&#8217; function.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The next yielded value
@@ -334,10 +334,10 @@ Python&gt;3.3).</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.send_wait">
-<tt class="descname">send_wait</tt><big>(</big><em>value</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.send_wait" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.send_wait">
+<tt class="descname">send_wait</tt><big>(</big><em>value</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.send_wait" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wait before sending a value to the generator to resume it.</p>
-<p>Generally works like <a class="reference internal" href="#WeakGeneratorWrapper.send" title="WeakGeneratorWrapper.send"><tt class="xref py py-meth docutils literal"><span class="pre">send()</span></tt></a>,
+<p>Generally works like <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.send" title="resumeback.WeakGeneratorWrapper.send"><tt class="xref py py-meth docutils literal"><span class="pre">send()</span></tt></a>,
 but will wait until a thread is paused
 before attempting to resume it.</p>
 <p><em>Additional</em> information:</p>
@@ -352,7 +352,7 @@ if <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference internal" href="#WaitTimeoutError" title="WaitTimeoutError"><strong>WaitTimeoutError</strong></a> &#8211; if the generator has not been paused.</li>
+<li><strong>WaitTimeoutError</strong> &#8211; if the generator has not been paused.</li>
 <li><strong>RuntimeError</strong> &#8211; if the generator has already terminated.</li>
 </ul>
 </td>
@@ -362,12 +362,12 @@ if <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.send_wait_async">
-<tt class="descname">send_wait_async</tt><big>(</big><em>value</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.send_wait_async" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.send_wait_async">
+<tt class="descname">send_wait_async</tt><big>(</big><em>value</em>, <em>timeout=None</em><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.send_wait_async" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a waiting daemon thread to send a value to the generator.</p>
-<p>Works like <a class="reference internal" href="#WeakGeneratorWrapper.send_wait" title="WeakGeneratorWrapper.send_wait"><tt class="xref py py-meth docutils literal"><span class="pre">send_wait()</span></tt></a>
+<p>Works like <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.send_wait" title="resumeback.WeakGeneratorWrapper.send_wait"><tt class="xref py py-meth docutils literal"><span class="pre">send_wait()</span></tt></a>
 but does it asynchronously.
-The thread spawned raises <a class="reference internal" href="#WaitTimeoutError" title="WaitTimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">WaitTimeoutError</span></tt></a>
+The thread spawned raises <a class="reference internal" href="#resumeback.WaitTimeoutError" title="resumeback.WaitTimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">WaitTimeoutError</span></tt></a>
 when it times out.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -382,10 +382,10 @@ when it times out.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.throw">
-<tt class="descname">throw</tt><big>(</big><em>type</em><span class="optional">[</span>, <em>value</em><span class="optional">[</span>, <em>traceback</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.throw" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.throw">
+<tt class="descname">throw</tt><big>(</big><em>type</em><span class="optional">[</span>, <em>value</em><span class="optional">[</span>, <em>traceback</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.throw" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises an exception where the generator was suspended.</p>
-<p>Depending on <a class="reference internal" href="#WeakGeneratorWrapper.catch_stopiteration" title="WeakGeneratorWrapper.catch_stopiteration"><tt class="xref py py-attr docutils literal"><span class="pre">catch_stopiteration</span></tt></a>,
+<p>Depending on <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.catch_stopiteration" title="resumeback.WeakGeneratorWrapper.catch_stopiteration"><tt class="xref py py-attr docutils literal"><span class="pre">catch_stopiteration</span></tt></a>,
 <tt class="docutils literal"><span class="pre">StopIteration</span></tt> exceptions will be caught
 and their values returned instead,
 if any.</p>
@@ -403,17 +403,17 @@ Python&gt;3.3).</td>
 This includes the thrown exception
 if the generator does not catch it
 and excludes <cite>StopIteration</cite>,
-if <a class="reference internal" href="#WeakGeneratorWrapper.catch_stopiteration" title="WeakGeneratorWrapper.catch_stopiteration"><tt class="xref py py-attr docutils literal"><span class="pre">catch_stopiteration</span></tt></a> is set.</td>
+if <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.catch_stopiteration" title="resumeback.WeakGeneratorWrapper.catch_stopiteration"><tt class="xref py py-attr docutils literal"><span class="pre">catch_stopiteration</span></tt></a> is set.</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.throw_wait">
-<tt class="descname">throw_wait</tt><big>(</big><em>type</em>, <span class="optional">[</span><em>value</em>, <span class="optional">[</span><em>traceback</em>, <span class="optional">]</span><span class="optional">]</span><em>timeout=None</em><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.throw_wait" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.throw_wait">
+<tt class="descname">throw_wait</tt><big>(</big><em>type</em>, <span class="optional">[</span><em>value</em>, <span class="optional">[</span><em>traceback</em>, <span class="optional">]</span><span class="optional">]</span><em>timeout=None</em><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.throw_wait" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wait before throwing a value to the generator to resume it.</p>
-<p>Works like <a class="reference internal" href="#WeakGeneratorWrapper.throw" title="WeakGeneratorWrapper.throw"><tt class="xref py py-meth docutils literal"><span class="pre">throw()</span></tt></a>,
+<p>Works like <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.throw" title="resumeback.WeakGeneratorWrapper.throw"><tt class="xref py py-meth docutils literal"><span class="pre">throw()</span></tt></a>,
 but will wait until a thread is paused
 before attempting to resume it.</p>
 <p><em>Additional</em> information:</p>
@@ -428,7 +428,7 @@ if <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference internal" href="#WaitTimeoutError" title="WaitTimeoutError"><strong>WaitTimeoutError</strong></a> &#8211; if the generator has not been paused.</li>
+<li><strong>WaitTimeoutError</strong> &#8211; if the generator has not been paused.</li>
 <li><strong>RuntimeError</strong> &#8211; if the generator has already terminated.</li>
 </ul>
 </td>
@@ -438,12 +438,12 @@ if <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.throw_wait_async">
-<tt class="descname">throw_wait_async</tt><big>(</big><em>type</em>, <span class="optional">[</span><em>value</em>, <span class="optional">[</span><em>traceback</em>, <span class="optional">]</span><span class="optional">]</span><em>timeout=None</em><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.throw_wait_async" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.throw_wait_async">
+<tt class="descname">throw_wait_async</tt><big>(</big><em>type</em>, <span class="optional">[</span><em>value</em>, <span class="optional">[</span><em>traceback</em>, <span class="optional">]</span><span class="optional">]</span><em>timeout=None</em><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.throw_wait_async" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a waiting daemon thread to throw a value to the generator.</p>
-<p>Works like <a class="reference internal" href="#WeakGeneratorWrapper.throw_wait" title="WeakGeneratorWrapper.throw_wait"><tt class="xref py py-meth docutils literal"><span class="pre">throw_wait()</span></tt></a>
+<p>Works like <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.throw_wait" title="resumeback.WeakGeneratorWrapper.throw_wait"><tt class="xref py py-meth docutils literal"><span class="pre">throw_wait()</span></tt></a>
 but does it asynchronously.
-The thread spawned raises <a class="reference internal" href="#WaitTimeoutError" title="WaitTimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">WaitTimeoutError</span></tt></a>
+The thread spawned raises <a class="reference internal" href="#resumeback.WaitTimeoutError" title="resumeback.WaitTimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">WaitTimeoutError</span></tt></a>
 when it times out.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -458,14 +458,14 @@ when it times out.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.close">
-<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.close" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Equivalent to <tt class="docutils literal"><span class="pre">self.generator.close()</span></tt>.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.has_terminated">
-<tt class="descname">has_terminated</tt><big>(</big><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.has_terminated" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.has_terminated">
+<tt class="descname">has_terminated</tt><big>(</big><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.has_terminated" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the wrapped generator has terminated.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -478,8 +478,8 @@ when it times out.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.can_resume">
-<tt class="descname">can_resume</tt><big>(</big><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.can_resume" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WeakGeneratorWrapper.can_resume">
+<tt class="descname">can_resume</tt><big>(</big><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.can_resume" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test if the generator can be resumed, i.e. is not running or closed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -492,18 +492,18 @@ when it times out.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="WeakGeneratorWrapper.__call__">
-<tt class="descname">__call__</tt><big>(</big><big>)</big><a class="headerlink" href="#WeakGeneratorWrapper.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for <a class="reference internal" href="#WeakGeneratorWrapper.with_strong_ref" title="WeakGeneratorWrapper.with_strong_ref"><tt class="xref py py-meth docutils literal"><span class="pre">with_strong_ref()</span></tt></a>.</p>
+<dt id="resumeback.WeakGeneratorWrapper.__call__">
+<tt class="descname">__call__</tt><big>(</big><big>)</big><a class="headerlink" href="#resumeback.WeakGeneratorWrapper.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for <a class="reference internal" href="#resumeback.WeakGeneratorWrapper.with_strong_ref" title="resumeback.WeakGeneratorWrapper.with_strong_ref"><tt class="xref py py-meth docutils literal"><span class="pre">with_strong_ref()</span></tt></a>.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="StrongGeneratorWrapper">
-<em class="property">class </em><tt class="descname">StrongGeneratorWrapper</tt><big>(</big><em>generator</em>, <em>weak_generator=None</em>, <em>catch_stopiteration=True</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#StrongGeneratorWrapper" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.StrongGeneratorWrapper">
+<em class="property">class </em><tt class="descclassname">resumeback.</tt><tt class="descname">StrongGeneratorWrapper</tt><big>(</big><em>generator</em>, <em>weak_generator=None</em>, <em>catch_stopiteration=True</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#resumeback.StrongGeneratorWrapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wraps a generator and adds convenience features.</p>
-<p>Operates similar to <a class="reference internal" href="#WeakGeneratorWrapper" title="WeakGeneratorWrapper"><tt class="xref py py-class docutils literal"><span class="pre">WeakGeneratorWrapper</span></tt></a>,
+<p>Operates similar to <a class="reference internal" href="#resumeback.WeakGeneratorWrapper" title="resumeback.WeakGeneratorWrapper"><tt class="xref py py-class docutils literal"><span class="pre">WeakGeneratorWrapper</span></tt></a>,
 except that it holds a strong reference to the generator.
 Use this class
 if you want to pass the generator wrapper itself around,
@@ -514,8 +514,8 @@ so that the generator is not garbage-collected.</p>
 will create a circular reference.</p>
 </div>
 <dl class="method">
-<dt id="StrongGeneratorWrapper.__call__">
-<tt class="descname">__call__</tt><big>(</big><big>)</big><a class="headerlink" href="#StrongGeneratorWrapper.__call__" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.StrongGeneratorWrapper.__call__">
+<tt class="descname">__call__</tt><big>(</big><big>)</big><a class="headerlink" href="#resumeback.StrongGeneratorWrapper.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for <tt class="xref py py-meth docutils literal"><span class="pre">with_strong_ref()</span></tt>.</p>
 </dd></dl>
 
@@ -525,8 +525,8 @@ will create a circular reference.</p>
 <div class="section" id="exceptions">
 <h2>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="WaitTimeoutError">
-<em class="property">class </em><tt class="descname">WaitTimeoutError</tt><a class="headerlink" href="#WaitTimeoutError" title="Permalink to this definition">¶</a></dt>
+<dt id="resumeback.WaitTimeoutError">
+<em class="property">class </em><tt class="descclassname">resumeback.</tt><tt class="descname">WaitTimeoutError</tt><a class="headerlink" href="#resumeback.WaitTimeoutError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Error class that is raised when a specified timeout is exceeded.</p>
 </dd></dl>
 
@@ -542,7 +542,7 @@ will create a circular reference.</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Reference</a><ul>
-<li><a class="reference internal" href="#send-self">&#64;send_self</a></li>
+<li><a class="reference internal" href="#send-self-decorator"><tt class="docutils literal"><span class="pre">&#64;send_self</span></tt> decorator</a></li>
 <li><a class="reference internal" href="#wrappers">Wrappers</a></li>
 <li><a class="reference internal" href="#exceptions">Exceptions</a></li>
 </ul>

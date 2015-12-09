@@ -2,7 +2,7 @@
  Introduction
 ==============
 
-``send_self`` is a utility function decorator
+``resumeback`` provides a utility function decorator
 that enables using callback-based interfaces
 in **a single line of execution**
 -- a single function.
@@ -18,13 +18,13 @@ Installation
 
 .. code-block:: shell
 
-    $ pip install send_self
+    $ pip install resumeback
 
 
 Usage
 =====
 
-send_self's mechanic of sending a generator function
+``resumeback.send_self``'s mechanic of sending a generator function
 a handle to itself
 is what allows for better flow control
 using callback-based interfaces.
@@ -64,11 +64,11 @@ because we are jumping from the function call of ``ask_for_user_input``
 back to our previously defined function ``on_done``
 -- which is only ever going to be called once in this context.
 
-However, using ``send_self``,
+However, using ``resumeback.send_self``,
 we can do something to *flatten our line of execution*
 by passing a callback to resume execution in our original function::
 
-   from send_self import send_self
+   from resumeback import send_self
 
    @send_self
    def main():
@@ -85,9 +85,10 @@ by passing a callback to resume execution in our original function::
 How it works
 ============
 
-``send_self`` operates on generators and their possibility of sending
-arbitrary data to them whereever they paused execution.
-Upon calling a generator function decorated with ``@send_self``,
+``resumeback.send_self`` operates on generators
+and their possibility of sending arbitrary data to them
+whereever they paused execution.
+Upon calling a generator function decorated with ``@resumeback.send_self``,
 it is executed until the first ``yield`` statement.
 Immediately following,
 the generator gets sent a wrapper to itself so it may delegate its execution
@@ -125,7 +126,7 @@ This is but an optimization.
 Code
 ====
 
-The code is available on github: https://github.com/FichteFoll/send_self
+The code is available on github: https://github.com/FichteFoll/resumeback
 
 .. * :ref:`genindex`
 .. * :ref:`modindex`

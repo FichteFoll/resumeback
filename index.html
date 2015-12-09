@@ -5,12 +5,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
-    <title>Introduction &mdash; send_self 0.1.0 documentation</title>
-
+    
+    <title>Introduction &mdash; resumeback 0.1.0 documentation</title>
+    
     <link rel="stylesheet" href="_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -23,17 +23,17 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="send_self 0.1.0 documentation" href="#" />
+    <link rel="top" title="resumeback 0.1.0 documentation" href="#" />
     <link rel="next" title="Introduction" href="" />
-
+   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
   </head>
   <body>
-
-
+  
+  
   <div class="indexwrapper">
-
+  
 
     <div class="related">
       <h3>Navigation</h3>
@@ -44,18 +44,18 @@
         <li class="right" >
           <a href="#" title="Introduction"
              accesskey="N">next</a> |</li>
-        <li><a href="#">send_self 0.1.0 documentation</a> &raquo;</li>
+        <li><a href="#">resumeback 0.1.0 documentation</a> &raquo;</li> 
       </ul>
-    </div>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body">
-
+            
   <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p><tt class="docutils literal"><span class="pre">send_self</span></tt> is a utility function decorator
+<p><tt class="docutils literal"><span class="pre">resumeback</span></tt> provides a utility function decorator
 that enables using callback-based interfaces
 in <strong>a single line of execution</strong>
 &#8211; a single function.</p>
@@ -70,7 +70,7 @@ in <strong>a single line of execution</strong>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#send-self">&#64;send_self</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html#send-self-decorator"><tt class="docutils literal"><span class="pre">&#64;send_self</span></tt> decorator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html#wrappers">Wrappers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html#exceptions">Exceptions</a></li>
 </ul>
@@ -79,13 +79,13 @@ in <strong>a single line of execution</strong>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-shell"><div class="highlight"><pre><span class="nv">$ </span>pip install send_self
+<div class="highlight-shell"><div class="highlight"><pre><span class="nv">$ </span>pip install resumeback
 </pre></div>
 </div>
 </div>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>send_self&#8217;s mechanic of sending a generator function
+<p><tt class="docutils literal"><span class="pre">resumeback.send_self</span></tt>&#8216;s mechanic of sending a generator function
 a handle to itself
 is what allows for better flow control
 using callback-based interfaces.
@@ -122,10 +122,10 @@ this is rather awkward,
 because we are jumping from the function call of <tt class="docutils literal"><span class="pre">ask_for_user_input</span></tt>
 back to our previously defined function <tt class="docutils literal"><span class="pre">on_done</span></tt>
 &#8211; which is only ever going to be called once in this context.</p>
-<p>However, using <tt class="docutils literal"><span class="pre">send_self</span></tt>,
+<p>However, using <tt class="docutils literal"><span class="pre">resumeback.send_self</span></tt>,
 we can do something to <em>flatten our line of execution</em>
 by passing a callback to resume execution in our original function:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">send_self</span> <span class="kn">import</span> <span class="n">send_self</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">resumeback</span> <span class="kn">import</span> <span class="n">send_self</span>
 
 <span class="nd">@send_self</span>
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
@@ -142,9 +142,10 @@ by passing a callback to resume execution in our original function:</p>
 </div>
 <div class="section" id="how-it-works">
 <h2>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">send_self</span></tt> operates on generators and their possibility of sending
-arbitrary data to them whereever they paused execution.
-Upon calling a generator function decorated with <tt class="docutils literal"><span class="pre">&#64;send_self</span></tt>,
+<p><tt class="docutils literal"><span class="pre">resumeback.send_self</span></tt> operates on generators
+and their possibility of sending arbitrary data to them
+whereever they paused execution.
+Upon calling a generator function decorated with <tt class="docutils literal"><span class="pre">&#64;resumeback.send_self</span></tt>,
 it is executed until the first <tt class="docutils literal"><span class="pre">yield</span></tt> statement.
 Immediately following,
 the generator gets sent a wrapper to itself so it may delegate its execution
@@ -177,7 +178,7 @@ This is but an optimization.</p>
 </div>
 <div class="section" id="code">
 <h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
-<p>The code is available on github: <a class="reference external" href="https://github.com/FichteFoll/send_self">https://github.com/FichteFoll/send_self</a></p>
+<p>The code is available on github: <a class="reference external" href="https://github.com/FichteFoll/resumeback">https://github.com/FichteFoll/resumeback</a></p>
 </div>
 </div>
 
@@ -229,8 +230,8 @@ This is but an optimization.</p>
     &copy; Copyright 2015, FichteFoll.
     Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
   </div>
-
+  
   </div>
-
+  
   </body>
 </html>
