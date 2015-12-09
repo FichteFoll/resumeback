@@ -10,17 +10,32 @@ python:
   - "3.4"
   - "3.5"
 
+matrix:
+  include:
+    - env: RUN_FLAKE8=1
+      python: "3.5"
+
 install:
-  - pip install -r dev-requirements.txt
-  - pip install coveralls
+  - >
+    if [ -n $RUN_FLAKE8 ]
+    ; then
+      pip install flake8>=2.5.0
+    ; else
+      pip install -r dev-requirements.txt;
+      pip install coveralls
+    ; fi
 
 script:
-  - flake8 .
   - >
-    py.test tests/
-    --cov-config .coveragerc
-    --cov .
-    --cov-report term-missing
+    if [ -n $RUN_FLAKE8 ]
+    ; then
+      flake8 .
+    ; else
+      py.test tests/
+      --cov-config .coveragerc
+      --cov .
+      --cov-report term-missing
+    ; fi
 
 after_success:
-  - coveralls
+  - '[ -z $RUN_FLAKE8 ] && coveralls'
