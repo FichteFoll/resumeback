@@ -18,7 +18,7 @@ class TestSendSelfDeferring(object):
             yield defer(this.next)
             ts.run = True
 
-        wait_until_finished(func(), defer_calls=1)
+        wait_until_finished(func())
         assert ts.run
 
     def test_next_failures(self):
@@ -45,7 +45,7 @@ class TestSendSelfDeferring(object):
             assert (yield defer(this.send)) is None
             ts.run = True
 
-        wait_until_finished(func(), defer_calls=1)
+        wait_until_finished(func())
         assert ts.run
 
     def test_throw(self):

@@ -25,19 +25,15 @@ def defer(callback, *args, **kwargs):
     t.start()
 
 
-def wait_until_finished(wrapper, timeout=1, sleep=DEFAULT_SLEEP, defer_calls=1):
-    if not timeout:
-        timeout = defer_calls * DEFAULT_SLEEP + 1
+def wait_until_finished(wrapper, timeout=1, sleep=DEFAULT_SLEEP):
 
-    ref = wrapper.weak_generator
     start_time = time.time()
     while time.time() < start_time + timeout:
+        # Relies on .has_terminated, but shouldn't be a problem
         if wrapper.has_terminated():
             return
         time.sleep(sleep)
     else:
-        if ref() is None:
-            return
         raise RuntimeError("Has not been collected within %ss" % timeout)
 
 
