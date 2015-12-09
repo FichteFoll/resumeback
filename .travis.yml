@@ -29,7 +29,7 @@ script:
   - |-
     if [[ -n ${RUN_FLAKE8+x} ]]
     then
-      flake8 .
+      flake8 -v
     else
       py.test tests/ \
         --cov-config .coveragerc \
