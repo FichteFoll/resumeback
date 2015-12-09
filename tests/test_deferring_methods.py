@@ -2,28 +2,24 @@ import time
 
 import pytest
 
-from resumeback import (
-    send_self,
-    WaitTimeoutError
-)
+from resumeback import send_self, WaitTimeoutError
 
-from . import CustomError, defer, wait_until_finished
+from . import CustomError, defer, wait_until_finished, State
 
 
 class TestSendSelfDeferring(object):
 
     def test_next(self):
-        run = False
+        ts = State()
 
         @send_self
         def func():
-            nonlocal run
             this = yield
             yield defer(this.next)
-            run = True
+            ts.run = True
 
         wait_until_finished(func(), defer_calls=1)
-        assert run
+        assert ts.run
 
     def test_next_failures(self):
         @send_self
@@ -38,27 +34,25 @@ class TestSendSelfDeferring(object):
         func()
 
     def test_send(self):
-        run = False
+        ts = State()
 
         @send_self
         def func():
-            nonlocal run
             this = yield
 
             val = 345 + id(func)
             assert (yield defer(this.send, val)) == val
             assert (yield defer(this.send)) is None
-            run = True
+            ts.run = True
 
         wait_until_finished(func(), defer_calls=1)
-        assert run
+        assert ts.run
 
     def test_throw(self):
-        run = False
+        ts = State()
 
         @send_self
         def func():
-            nonlocal run
             this = yield
 
             val = 345 + id(func)
@@ -70,85 +64,66 @@ class TestSendSelfDeferring(object):
             else:
                 pytest.fail("no exception thrown")
 
-            run = True
+            ts.run = True
 
         wait_until_finished(func())
-        assert run
-
-    def test_throw_return(self):
-        val = 2 + id(self)
-
-        @send_self
-        def func():
-            yield
-            try:
-                yield
-            except CustomError:
-                return val
-
-        wrapper = func()
-        assert val == wrapper.throw(CustomError)
+        assert ts.run
 
     def test_close(self):
-        run = 0
+        ts = State()
 
         @send_self
         def func():
-            nonlocal run
             this = yield
-            run = 1
+            ts.run = True
             yield defer(this.close)
-            run = 2
+            ts.run = False
 
         wrapper = func()
         wait_until_finished(wrapper)
-        assert run == 1
+        assert ts.run
 
     def test_close_generatorexit(self):
-        run = 0
+        ts = State()
 
         def cb(this):
-            nonlocal run
             with pytest.raises(RuntimeError):
                 this.close()
-            run += 1
+            ts.inc()
             this.next()
 
         @send_self
         def func():
-            nonlocal run
             this = yield
-            run += 1
+            ts.inc()
             with pytest.raises(GeneratorExit):
                 yield defer(cb, this())
             yield
-            run += 1
+            ts.inc()
 
         wrapper = func().with_weak_ref()
         wait_until_finished(wrapper)
-        assert run == 3
+        assert ts.counter == 3
 
     def test_close_garbagecollected(self):
-        run = False
+        ts = State()
 
         @send_self
         def func():
-            nonlocal run
             yield
             with pytest.raises(GeneratorExit):
                 yield
-            run = True
+            ts.run = True
 
         wrapper = func().with_weak_ref()
         wait_until_finished(wrapper)
-        assert run
+        assert ts.run
 
     def test_wait(self):
-        run = False
+        ts = State()
 
         @send_self(debug=True)
         def func():
-            nonlocal run
             this = yield
 
             defer(this.next_wait, sleep=0)
@@ -164,11 +139,11 @@ class TestSendSelfDeferring(object):
             with pytest.raises(CustomError):
                 yield
 
-            run = True
+            ts.run = True
 
         wrapper = func()
         wait_until_finished(wrapper)
-        assert run
+        assert ts.run
 
         with pytest.raises(RuntimeError):
             wrapper.next_wait()
@@ -178,11 +153,10 @@ class TestSendSelfDeferring(object):
             wrapper.throw_wait(CustomError)
 
     def test_wait_timeout(self):
-        run = False
+        ts = State()
 
         @send_self
         def func():
-            nonlocal run
             this = yield
 
             with pytest.raises(WaitTimeoutError):
@@ -194,36 +168,34 @@ class TestSendSelfDeferring(object):
             with pytest.raises(WaitTimeoutError):
                 this.throw_wait(timeout=0.01)
 
-            run = True
+            ts.run = True
 
         wait_until_finished(func())
-        assert run
+        assert ts.run
 
     def test_wait_timeout2(self):
-        run = False
+        ts = State()
         timeouts = range(1, 18, 8)
 
         @send_self
         def func(timeout):
-            nonlocal run
             this = yield
             start = time.time()
             with pytest.raises(WaitTimeoutError):
                 this.next_wait(timeout=timeout)
             assert time.time() - start > timeout
-            run = True
+            ts.run = True
 
         for timeout in timeouts:
             wait_until_finished(func(timeout / 100.0))
-            assert run
-            run = False
+            assert ts.run
+            ts.run = False
 
     def test_wait_async(self):
-        run = False
+        ts = State()
 
         @send_self(debug=True)
         def func():
-            nonlocal run
             this = yield
 
             this.next_wait_async()
@@ -241,17 +213,16 @@ class TestSendSelfDeferring(object):
             with pytest.raises(CustomError):
                 yield
 
-            run = True
+            ts.run = True
 
         wait_until_finished(func())
-        assert run
+        assert ts.run
 
     def test_wait_async_timeout(self):
-        run = False
+        ts = State()
 
         @send_self(debug=True)
         def func():
-            nonlocal run
             this = yield
 
             t1 = this.next_wait_async(timeout=0.01)
@@ -265,7 +236,7 @@ class TestSendSelfDeferring(object):
             assert not t1.is_alive()
             assert not t2.is_alive()
             assert not t3.is_alive()
-            run = True
+            ts.run = True
 
         func()
-        assert run
+        assert ts.run

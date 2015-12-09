@@ -2,63 +2,57 @@ import pytest
 
 from resumeback import send_self
 
-from . import CustomError, defer, wait_until_finished
+from . import CustomError, defer, wait_until_finished, State
 
 
 class TestSubgenerators(object):
 
     def test_subgenerator_next(self):
-        run = False
+        ts = State()
 
         def subgenerator(this):
-            nonlocal run
             yield defer(this.next)
-            run = True
+            ts.run = True
 
         @send_self
         def func():
-            nonlocal run
             this = yield
             yield from subgenerator(this)
 
         wrapper = func()
         wait_until_finished(wrapper)
-        assert run
+        assert ts.run
 
     def test_subgenerator_send(self):
-        run = False
+        ts = State()
         val = 123 + id(self)
 
         def subgenerator(this):
-            nonlocal run, val
             assert (yield defer(this.send, val)) == val
-            run = True
+            ts.run = True
 
         @send_self
         def func():
-            nonlocal run
             this = yield
             yield from subgenerator(this)
 
         wrapper = func()
         wait_until_finished(wrapper)
-        assert run
+        assert ts.run
 
     def test_subgenerator_throw(self):
-        run = False
+        ts = State()
 
         def subgenerator(this):
-            nonlocal run
             with pytest.raises(CustomError):
                 yield defer(this.throw, CustomError)
-            run = True
+            ts.run = True
 
         @send_self
         def func():
-            nonlocal run
             this = yield
             yield from subgenerator(this)
 
         wrapper = func()
         wait_until_finished(wrapper)
-        assert run
+        assert ts.run

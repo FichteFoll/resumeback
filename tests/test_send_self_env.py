@@ -7,37 +7,35 @@ from resumeback import (
     StrongGeneratorWrapper
 )
 
-from . import CustomError
+from . import CustomError, State
 
 
 class TestSendSelfEnvironment(object):
 
     def test_wrapper_type(self):
-        run = False
+        ts = State()
 
         @send_self
         def func():
-            nonlocal run
             this = yield
             assert type(this) is WeakGeneratorWrapper
-            run = True
+            ts.run = True
 
         assert type(func() is StrongGeneratorWrapper)
-        assert run
+        assert ts.run
 
     def test_send_self_return(self):
+        ts = State()
         val = 123 + id(self)
-        run = False
 
         @send_self_return
         def func():
-            nonlocal val, run
             this = yield val
             assert type(this) is WeakGeneratorWrapper
-            run = True
+            ts.run = True
 
         assert func() == val
-        assert run
+        assert ts.run
 
     def test_wrapping(self):
         def func():
@@ -74,50 +72,25 @@ class TestSendSelfEnvironment(object):
             with pytest.raises(StopIteration):
                 getattr(w, meth)(*args)
 
-    def test_not_catch_stopiteration_value(self):
-        val = id(self) + 100
-
-        @send_self(catch_stopiteration=False)
-        def func():
-            nonlocal val
-            yield
-            try:
-                yield
-            except CustomError:
-                pass
-            return val  # Raises StopIteration here
-
-        for meth, args in [('next',  []),
-                           ('send',  [val + 1]),
-                           ('throw', [CustomError])]:
-            w = func()
-            try:
-                getattr(w, meth)(*args)
-            except StopIteration as si:
-                assert si.value == val
-            else:
-                pytest.fail("Did not raise")
-
     def test_finalize_callback(self):
-        wref = None
-        called = 0
+        ts = State()
+        ts.called = 0
+        ts.wref = None
 
         def cb(ref):
-            nonlocal called, wref
-            assert ref is wref
+            assert ref is ts.wref
             assert ref() is None
-            called += 1
+            ts.called += 1
 
         @send_self(finalize_callback=cb)
         def func():
-            nonlocal called, wref
             this = yield
-            wref = this.weak_generator
-            called += 1
+            ts.wref = this.weak_generator
+            ts.called += 1
             # Now, terminate and let gc do its work
 
         func()
-        assert called == 2
+        assert ts.called == 2
 
     def test_cleanup_return(self):
         @send_self
@@ -146,25 +119,24 @@ class TestSendSelfEnvironment(object):
 
         assert val == func()
 
-    def test_yield_parameter(self):
-        run = False
+    def test_parameter(self):
+        ts = State()
         val = ("const", id(self))
 
         @send_self
         def func(param):
-            nonlocal val, run
             yield
             assert param == val
-            run = True
+            ts.run = True
 
         func(val)
-        assert run
+        assert ts.run
 
     @pytest.mark.parametrize(
         'error, func, args, kwargs',
         [
             # "func" arg
-            (ValueError, test_yield_parameter, [], {}),
+            (ValueError, test_parameter, [], {}),
             (ValueError, lambda x: x ** 2, [], {}),
             (ValueError, type, [], {}),
             # "both" args

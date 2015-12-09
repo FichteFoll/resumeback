@@ -9,7 +9,10 @@ class CustomError(Exception):
     pass
 
 
-def defer(callback, *args, sleep=DEFAULT_SLEEP, expected_return=None, call=True, **kwargs):
+def defer(callback, *args, **kwargs):
+    sleep = kwargs.pop('sleep', DEFAULT_SLEEP)
+    expected_return = kwargs.pop('expected_return', None)
+    call = kwargs.pop('call', True)
 
     def func():
         time.sleep(sleep)
@@ -36,3 +39,12 @@ def wait_until_finished(wrapper, timeout=1, sleep=DEFAULT_SLEEP, defer_calls=1):
         if ref() is None:
             return
         raise RuntimeError("Has not been collected within %ss" % timeout)
+
+
+class State(object):
+    def __init__(self):
+        self.counter = 0
+        self.run = False
+
+    def inc(self):
+        self.counter += 1

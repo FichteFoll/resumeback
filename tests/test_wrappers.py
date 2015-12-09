@@ -1,9 +1,11 @@
+from __future__ import print_function
+
 import time
 import weakref
 
 from resumeback import send_self, StrongGeneratorWrapper, WeakGeneratorWrapper
 
-from . import defer
+from . import defer, State
 
 
 class TestGeneratorWrappers(object):
@@ -35,7 +37,7 @@ class TestGeneratorWrappers(object):
 
     # Also checks preservance of weak_generator object
     def test_with_weak_ref(self):
-        run = False
+        ts = State()
 
         # Note that `weakref.ref(obj) is weakref.ref(obj)`
         # always holds true,
@@ -44,7 +46,6 @@ class TestGeneratorWrappers(object):
         # However, even then they compare equal.
         @send_self(finalize_callback=print)
         def func():
-            nonlocal run
             this = yield
             thises = [
                 this,
@@ -61,18 +62,17 @@ class TestGeneratorWrappers(object):
                 assert that.weak_generator is this.weak_generator
                 assert comp_ref.weak_generator is not that.weak_generator
                 assert comp_ref.weak_generator == that.weak_generator
-            run = True
+            ts.run = True
 
         func()
-        assert run
+        assert ts.run
 
     def test_with_strong_ref(self):
-        run = False
+        ts = State()
 
         # See test_with_weak_ref
         @send_self(finalize_callback=print)
         def func():
-            nonlocal run
             this = yield
             this_strong = this.with_strong_ref()
             thises = [
@@ -92,41 +92,38 @@ class TestGeneratorWrappers(object):
                 assert comp_ref.weak_generator == that.weak_generator
             del thises
             del comp_ref
-            run = True
+            ts.run = True
 
         func()
-        assert run
+        assert ts.run
 
     def test_has_terminated(self):
-        run = False
+        ts = State()
 
         @send_self
         def func():
-            nonlocal run
             yield
-            run = True
+            ts.run = True
 
         assert func().has_terminated()
-        assert run
-        run = False
+        assert ts.run
+        ts.run = False
 
         def cb(this):
-            print('cb run')
             assert not this.has_terminated()
             this.send_wait(True)
 
         @send_self
         def func2():
-            nonlocal run
             this = yield
             assert not this.has_terminated()
 
-            run = yield defer(cb, this, sleep=0)
+            ts.run = yield defer(cb, this, sleep=0)
             yield
 
         wrapper = func2()
         time.sleep(0.1)
-        assert run
+        assert ts.run
 
         assert not wrapper.has_terminated()
         wrapper.next()
