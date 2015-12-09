@@ -85,7 +85,7 @@ class WeakGeneratorWrapper(object):
         original_timeout = timeout
         while timeout is None or timeout > 0:
             last_time = time.time()
-            if self._lock.acquire(timeout=timeout or -1):
+            if self._lock.acquire(False):  # timeout param was added in 3.2
                 try:
                     if self.can_resume():
                         return method(generator, *args, **kwargs)
@@ -131,9 +131,9 @@ class WeakGeneratorWrapper(object):
     def _next_wait_async(self, generator, timeout=None):
         thread = threading.Thread(
             target=self._next_wait,
-            args=(generator, timeout),
-            daemon=True
+            args=(generator, timeout)
         )
+        thread.daemon = True
         if self.debug:
             print("spawned new thread to call %s_wait: %r" % ('next', thread))
         thread.start()
@@ -174,9 +174,9 @@ class WeakGeneratorWrapper(object):
         thread = threading.Thread(
             target=self._send_wait,
             args=(generator,),
-            kwargs={'value': value, 'timeout': timeout},
-            daemon=True
+            kwargs={'value': value, 'timeout': timeout}
         )
+        thread.daemon = True
         if self.debug:
             print("spawned new thread to call %s_wait: %r" % ('send', thread))
         thread.start()
@@ -217,9 +217,9 @@ class WeakGeneratorWrapper(object):
         thread = threading.Thread(
             target=self._throw_wait,
             args=args,
-            kwargs=kwargs,
-            daemon=True
+            kwargs=kwargs
         )
+        thread.daemon = True
         if self.debug:
             print("spawned new thread to call %s_wait: %r" % ('throw', thread))
         thread.start()
