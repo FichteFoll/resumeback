@@ -16,25 +16,25 @@ matrix:
       python: "3.5"
 
 install:
-  - >-
-    if [[ -n ${RUN_FLAKE8+x} ]];
+  - |-
+    if [[ -n ${RUN_FLAKE8+x} ]]
     then
-      pip install flake8>=2.5.0;
+      pip install flake8>=2.5.0
     else
-      pip install -r dev-requirements.txt;
-      pip install coveralls;
+      pip install -r dev-requirements.txt
+      pip install coveralls
     fi
 
 script:
-  - >-
-    if [[ -n ${RUN_FLAKE8+x} ]];
+  - |-
+    if [[ -n ${RUN_FLAKE8+x} ]]
     then
-      flake8 .;
+      flake8 .
     else
-      py.test tests/
-      --cov-config .coveragerc
-      --cov .
-      --cov-report term-missing;
+      py.test tests/ \
+        --cov-config .coveragerc \
+        --cov . \
+        --cov-report term-missing;
     fi
 
 after_success:
