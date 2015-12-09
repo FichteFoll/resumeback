@@ -105,7 +105,7 @@ class TestGarbageCollection(object):
         assert ts.run
         assert wrapper.generator is not None
 
-    @pytest.mark.xfail(sys.version_info <= (3, 3),
+    @pytest.mark.xfail(sys.version_info < (3, 4),
                        raises=AssertionError,
                        reason="changes in garbage collection")
     def test_circular_strongref_suspended(self):
