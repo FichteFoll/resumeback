@@ -1,6 +1,7 @@
 [run]
 omit =
   conftest.py
+  setup.py
 
 [report]
 # Regexes for lines to exclude from consideration
