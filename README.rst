@@ -1,13 +1,23 @@
-==================================================
- resumeback - Using callbacks to resume your code
-==================================================
+============
+ resumeback
+============
 
-.. image:: https://travis-ci.org/FichteFoll/resumeback.svg?branch=master
+.. image:: https://travis-ci.org/FichteFoll/resumeback.svg
    :target: https://travis-ci.org/FichteFoll/resumeback
 
-.. image:: https://coveralls.io/repos/FichteFoll/resumeback/badge.svg?branch=master&service=github
+.. image:: https://coveralls.io/repos/FichteFoll/resumeback/badge.svg
    :target: https://coveralls.io/github/FichteFoll/resumeback?branch=master
 
+.. image:: https://img.shields.io/pypi/v/resumeback.svg
+    :target: https://pypi.python.org/pypi/resumeback
+
+.. image:: https://img.shields.io/pypi/pyversions/resumeback.svg
+    :target: https://pypi.python.org/pypi/resumeback/
+
+.. .. image:: https://img.shields.io/pypi/dd/resumeback.svg
+..     :target: https://pypi.python.org/pypi/resumeback/
+
+A Python library for using callbacks to resume your code.
 
 ``resumeback`` provides a utility function decorator
 that enables using callback-based interfaces
@@ -100,5 +110,5 @@ on the Sublime Text forum.
 I just took his idea "to the next (abstraction) level"
 and made it more convenient to use.
 
-.. __: http://www.sublimetext.com/forum/viewtopic.php?f=6&t=17671
-.. __: https://github.com/Varriount
+__ http://www.sublimetext.com/forum/viewtopic.php?f=6&t=17671
+__ https://github.com/Varriount
