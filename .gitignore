@@ -11,3 +11,8 @@ htmlcov/
 
 # docs
 sphinx_build/
+
+# distribution
+dist/
+build/
+*.egg-info/
