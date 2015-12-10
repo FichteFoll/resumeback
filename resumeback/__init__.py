@@ -1,4 +1,7 @@
+"""Library for using callbacks to resume your code."""
+
 from __future__ import print_function
+
 
 import sys
 
@@ -12,6 +15,12 @@ import threading
 import time
 import weakref
 
+
+__version__ = "0.1.0"
+
+version_info = __version__.split('.')
+
+__author__ = "FichteFoll <fichtfoll2@googlemail.com>"
 
 __all__ = (
     'send_self',
