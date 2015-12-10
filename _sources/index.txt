@@ -2,6 +2,8 @@
  Introduction
 ==============
 
+A Python library for using callbacks to resume your code.
+
 ``resumeback`` provides a utility function decorator
 that enables using callback-based interfaces
 in **a single line of execution**
