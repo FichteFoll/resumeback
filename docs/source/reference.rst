@@ -2,11 +2,27 @@
  Reference
 ===========
 
+.. currentmodule:: resumeback
+
+
+``resume_back`` module
+======================
+
+.. attribute:: __version__
+
+   The version of the module as a string,
+   following the semver__ 2.0.0 spec.
+
+   __ http://semver.org
+
+.. attribute:: version_info
+
+   A tuple containing the :attr:`__version__` in (major, minor, patch) format.
+
 
 ``@send_self`` decorator
 ========================
 
-.. currentmodule:: resumeback
 
 .. decorator:: send_self
 .. decorator:: send_self(catch_stopiteration=True, finalize_callback=None, debug=False)
