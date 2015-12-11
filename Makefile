@@ -1,6 +1,7 @@
-## variables ###################################
+################################################
+## variables
 
-## Paths
+## executables
 SPHINXBUILD = sphinx-build
 PIP         = pip
 PIP2        = pip-2.7
@@ -8,12 +9,12 @@ PYTEST      = py.test
 PYTHON      = python
 FLAKE8      = flake8
 
-## Sources
-DOCSOURCEDIR   = docs/source
+## sources
+DOCSOURCEDIR   = docs/source/
 DOCSOURCEFILES = index.rst reference.rst conf.py
 DOCSOURCES     = $(addprefix $(DOCSOURCEDIR),$(DOCSOURCEFILES))
 
-## Opts
+## opts
 SPHINXOPTS      =
 SPHINX_BUILDDIR = sphinx_build
 ALLSPHINXOPTS   = -d $(SPHINX_BUILDDIR)/doctrees $(SPHINXOPTS) docs/source
@@ -29,15 +30,16 @@ FLAKE8OPTS = -v
 # TEST =
 
 
-## targets ########################################
+################################################
+## targets
 
 .PHONY: all help clean init install uninstall \
 	distclean dist \
-	docsinit docsclean html \
+	docsinit docsclean \
 	flake8 test test2 coverage htmlcoverage
 
 
-## meta ########################################
+## meta ####################
 
 # target: all - (DEFAULT) Build dist and docs.
 all: distclean dist html
@@ -64,7 +66,7 @@ uninstall:
 	$(PIP) uninstall resumeback -y
 
 
-## dist ########################################
+## dist ####################
 
 # target: distclean - clean dist folder.
 distclean:
@@ -81,7 +83,7 @@ upload: dist/resumeback-*.zip dist/resumeback-*.whl
 	touch upload
 
 
-## docs ########################################
+## docs ####################
 
 # target: docsinit - Install requirements for building docs.
 docsinit:
@@ -91,8 +93,10 @@ docsinit:
 docsclean:
 	rm -rf $(SPHINX_BUILDDIR)/*
 
-# target: htmldocs - Build html docs.
-html: $(addprefix docs/source/,$(DOCSOURCES))
+# target: html - Build html docs.
+html: $(SPHINX_BUILDDIR)/html
+
+$(SPHINX_BUILDDIR)/html: $(DOCSOURCES)
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(SPHINX_BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(SPHINX_BUILDDIR)/html."
@@ -100,7 +104,7 @@ html: $(addprefix docs/source/,$(DOCSOURCES))
 # TODO uploaddocs target
 
 
-## other tasks #################################
+## other tasks #############
 
 # target: flake8 - Run flake8 on source.
 flake8:
