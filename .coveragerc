@@ -2,6 +2,7 @@
 omit =
   conftest.py
   setup.py
+  _util.py
 
 [report]
 # Regexes for lines to exclude from consideration
