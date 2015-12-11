@@ -16,3 +16,6 @@ sphinx_build/
 dist/
 build/
 *.egg-info/
+
+# make
+upload
