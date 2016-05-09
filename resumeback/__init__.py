@@ -20,7 +20,7 @@ __version__ = "0.1.0"
 
 version_info = __version__.split('.')
 
-__author__ = "FichteFoll <fichtfoll2@googlemail.com>"
+__author__ = "FichteFoll <fichtefoll2@googlemail.com>"
 
 __all__ = (
     'send_self',
