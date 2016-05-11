@@ -33,7 +33,7 @@ FLAKE8OPTS = -v
 ################################################
 ## targets
 
-.PHONY: all help clean init install uninstall \
+.PHONY: all help clean dev install uninstall \
 	distclean dist \
 	docsinit docsclean \
 	flake8 test test2 coverage htmlcoverage
@@ -53,8 +53,8 @@ help:
 clean: distclean docsclean
 	rm upload
 
-# target: init -Install dev-requirements.txt
-init:
+# target: dev - Install dev-requirements.txt
+dev:
 	$(PIP) install -r dev-requirements.txt
 
 # target: install - Run setup.py to install.
@@ -101,7 +101,7 @@ $(SPHINX_BUILDDIR)/html: $(DOCSOURCES)
 	@echo
 	@echo "Build finished. The HTML pages are in $(SPHINX_BUILDDIR)/html."
 
-# TODO uploaddocs target
+# TODO docsupload target
 
 
 ## other tasks #############
