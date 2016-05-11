@@ -16,7 +16,7 @@ matrix:
       python: "3.5"
 
 install:
-  - make ci_init
+  - make ci_install
 
 script:
   - make ci_script
