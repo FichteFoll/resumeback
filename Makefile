@@ -36,7 +36,8 @@ FLAKE8OPTS = -v
 .PHONY: all help clean dev install uninstall \
 	distclean dist \
 	docsinit docsclean \
-	flake8 test test2 coverage htmlcoverage
+	flake8 test test2 coverage htmlcoverage \
+	ci_install ci_script ci_after
 
 
 ## meta ####################
@@ -125,3 +126,25 @@ coverage:
 # target: htmlcoverage - Run tests (default) and build html coverage report.
 htmlcoverage:
 	$(PYTEST) $(ALLCOVOPTS) --cov-report html
+
+
+## CI ######################
+
+# target: ci_install - Initialize CI environment
+ci_install: dev
+ifneq ($(RUN_FLAKE8),1)
+	$(PIP) install coveralls
+endif
+
+# target: ci_script - Perform correct CI action according to env
+ifeq ($(RUN_FLAKE8),1)
+ci_script: flake8
+else
+ci_script: coverage
+endif
+
+# target: ci_after - Perform operations after the script succeeded
+ci_after:
+ifneq ($(RUN_FLAKE8),1)
+	coveralls
+endif
