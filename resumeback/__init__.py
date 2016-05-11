@@ -3,17 +3,17 @@
 from __future__ import print_function
 
 
+from functools import partial, update_wrapper
+import inspect
 import sys
+import threading
+import time
+import weakref
 
 if sys.version_info < (3,):
     import collections as c_abc
 else:
     from collections import abc as c_abc
-from functools import partial, update_wrapper
-import inspect
-import threading
-import time
-import weakref
 
 
 __version__ = "0.1.0"
