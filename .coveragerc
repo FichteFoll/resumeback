@@ -11,7 +11,7 @@ exclude_lines =
   pragma: no cover
 
   # Code that is supposed to fail does not need coverage testing
-  pytest.fail
+  pytest\.fail
 
   # This line is only ever used to make tests fail
-  ts.run = False
+  ts\.run = False
