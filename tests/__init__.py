@@ -33,8 +33,8 @@ def wait_until_finished(wrapper, timeout=1, sleep=DEFAULT_SLEEP):
         if wrapper.has_terminated():
             return
         time.sleep(sleep)
-    else:
-        raise RuntimeError("Has not been collected within %ss" % timeout)
+
+    raise RuntimeError("Has not been collected within %ss" % timeout)
 
 
 class State(object):
