@@ -1,5 +1,6 @@
 # uninteresting dev files
 *.sublime-*
+venv/
 
 # (binary) cache files
 *.pyc
