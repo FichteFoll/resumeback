@@ -20,7 +20,7 @@ SPHINX_BUILDDIR = sphinx_build
 ALLSPHINXOPTS   = -d $(SPHINX_BUILDDIR)/doctrees $(SPHINXOPTS) docs/source
 
 COVOPTS    =
-ALLCOVOPTS = --cov . --cov-config .coveragerc $(COVOPTS)
+ALLCOVOPTS = --cov resumeback --cov-config .coveragerc $(COVOPTS)
 
 FLAKE8OPTS = -v
 
