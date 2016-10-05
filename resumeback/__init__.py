@@ -310,9 +310,11 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
     __call__ = with_weak_ref
 
 
-# Move first argument to a "_func" kwarg if it's callable
 class SendSelfMeta(type):
-    def __call__(cls, *args, **kwargs):
+
+    """Wraps the first argument to a _func kwarg if it's callable."""
+
+    def __call__(cls, *args, **kwargs):  # noqa: N805
         if args and callable(args[0]):
             func = args[0]
             args = args[1:]
@@ -323,7 +325,7 @@ class SendSelfMeta(type):
         return super(SendSelfMeta, cls).__call__(*args, _func=func, **kwargs)
 
 
-class send_self(with_metaclass(SendSelfMeta)):
+class send_self(with_metaclass(SendSelfMeta)):  # noqa: N801
 
     """Decorator that sends a generator a wrapper of itself.
 
@@ -390,7 +392,7 @@ class send_self(with_metaclass(SendSelfMeta)):
         return self._start_generator(generator)
 
 
-class send_self_return(send_self):
+class send_self_return(send_self):  # noqa: N801
 
     """Decorator that sends a generator a wrapper of itself."""
 
