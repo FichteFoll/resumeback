@@ -98,11 +98,11 @@ environment however it wishes.
 
 Generators in Python provide four methods for interacting with them:
 
-1. next -- to just resume execution
+1. **next** -- to just resume execution
    (this is available on Python 3 via ``next(generator)``)
-2. send -- to resume execution and additionally send any value to it
-3. throw -- to raise an exception at the position the generator paused
-4. close -- to close the generator
+2. **send** -- to resume execution and additionally send any value to it
+3. **throw** -- to raise an exception at the position the generator paused
+4. **close** -- to close the generator
 
 For the first three methods,
 the wrapper additionally defines ``*_wait`` method variants,

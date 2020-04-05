@@ -1,0 +1,47 @@
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "resumeback"
+version = "0.2.0-dev"
+description = "Library for using callbacks to resume your code."
+authors = ["FichteFoll <fichtefoll2@googlemail.com>"]
+license = "MIT"
+readme = "README.rst"
+homepage = "http://fichtefoll.github.io/resumeback/"
+repository = "https://github.com/FichteFoll/resumeback"
+packages = [
+    { include = "resumeback" },
+    { include = "tests", format = "sdist" },
+]
+classifiers = [
+    'Development Status :: 4 - Beta',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: OS Independent',
+    'Topic :: Software Development :: Libraries',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+]
+
+[tool.poetry.dependencies]
+python = "^3.5"
+
+# Actually dev dependencies, but those can't be specified in extras.
+# https://github.com/python-poetry/poetry/issues/129
+pytest = { version = "^5.4.1", optional = true }
+pytest-cov = { version = "^2.8.1", optional = true }
+flake8 = { version = "^3.7.9", optional = true }
+sphinx = { version = "^2.4.4", optional = true }
+sphinx-readable-theme = { version = "^1.3.0", optional = true }
+
+[tool.poetry.dev-dependencies]
+# See optional dependencies above
+
+[tool.poetry.extras]
+docs = ["sphinx", "sphinx-readable-theme"]
+test = ["pytest", "pytest-cov"]
+flake8 = ["flake8"]
+
+[tool.pytest]
+testpaths = "tests"

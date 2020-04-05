@@ -1,10 +1,12 @@
 # uninteresting dev files
-*.sublime-*
-venv/
+.tox/
+/*.tmp
+setup.py
+publish
 
 # (binary) cache files
 *.pyc
-**/cache
+cache
 
 # coverage
 htmlcov/
@@ -17,6 +19,3 @@ sphinx_build/
 dist/
 build/
 *.egg-info/
-
-# make
-upload

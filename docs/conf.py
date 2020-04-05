@@ -14,6 +14,7 @@
 
 import sys
 import os
+import datetime
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -46,15 +47,13 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'resumeback'
-copyright = u'2015, FichteFoll'
+project = 'resumeback'
+copyright = f'2015-{datetime.datetime.now().year}, FichteFoll'
 
-# Dynamically determine version from source
+# Load version from source
 sys.path.insert(0, os.path.abspath('./../..'))  # autodoc
-from _util import find_version
-
-release = find_version('resumeback', '__init__.py')
-version = ".".join(release.split(".")[:1])
+import resumeback
+version = resumeback.__version__
 
 
 # The version info for the project you're documenting, acts as replacement for
@@ -225,8 +224,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'resumeback.tex', u'resumeback Documentation',
-   u'FichteFoll', 'manual'),
+  ('index', 'resumeback.tex', 'resumeback Documentation',
+   'FichteFoll', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -255,8 +254,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'resumeback', u'resumeback Documentation',
-     [u'FichteFoll'], 1)
+    ('index', 'resumeback', 'resumeback Documentation',
+     ['FichteFoll'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -269,8 +268,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'resumeback', u'resumeback Documentation',
-   u'FichteFoll', 'resumeback', 'One line description of project.',
+  ('index', 'resumeback', 'resumeback Documentation',
+   'FichteFoll', 'resumeback', 'One line description of project.',
    'Miscellaneous'),
 ]
 

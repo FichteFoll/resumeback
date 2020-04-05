@@ -2,149 +2,127 @@
 ## variables
 
 ## executables
-SPHINXBUILD = sphinx-build
-PIP         = pip
-PIP2        = pip-2.7
-PYTEST      = py.test
-PYTHON      = python
-FLAKE8      = flake8
+POETRY      = poetry
+SPHINXBUILD = $(POETRY) run sphinx-build
+PYTEST      = $(POETRY) run py.test
+PYTHON      = $(POETRY) run python
+FLAKE8      = $(POETRY) run flake8
 
 ## sources
-DOCSOURCEDIR   = docs/source/
-DOCSOURCEFILES = index.rst reference.rst conf.py
-DOCSOURCES     = $(addprefix $(DOCSOURCEDIR),$(DOCSOURCEFILES))
+DOCSOURCEDIR   = docs/
+DOCSOURCES     = $(wildcard $(DOCSOURCEDIR)/*)
+# DOCSOURCEFILES = index.rst reference.rst conf.py
+# DOCSOURCES     = $(addprefix $(DOCSOURCEDIR),$(DOCSOURCEFILES))
+SPHINX_BUILDDIR = sphinx_build
 
 ## opts
-SPHINXOPTS      =
-SPHINX_BUILDDIR = sphinx_build
-ALLSPHINXOPTS   = -d $(SPHINX_BUILDDIR)/doctrees $(SPHINXOPTS) docs/source
-
+POETRYOPTS =
+PYTESTOPTS =
+FLAKE8OPTS =
 COVOPTS    =
-ALLCOVOPTS = --cov resumeback --cov-config .coveragerc $(COVOPTS)
+SPHINXOPTS =
 
-FLAKE8OPTS = -v
+ALLCOVOPTS = $(PYTESTOPTS) --cov resumeback --cov-config .coveragerc $(COVOPTS)
+ALLSPHINXOPTS = -d $(SPHINX_BUILDDIR)/doctrees $(SPHINXOPTS) $(DOCSOURCEDIR)
 
-## Continuous Tests
-# TODO build/alter init and test recipes
-# INIT =
-# TEST =
 
 
 ################################################
 ## targets
 
-.PHONY: all help clean dev install uninstall \
-	distclean dist \
-	docsinit docsclean \
-	flake8 test test2 coverage htmlcoverage \
-	ci_install ci_script ci_after
-
-
 ## meta ####################
 
+.PHONY: all
 # target: all - (DEFAULT) Build dist and docs.
-all: distclean dist html
+all: dist docs
 	@echo
 
+.PHONY: help
 # target: help - Display callable targets.
 help:
 	@grep -E "^# target:" [Mm]akefile
 
+.PHONY: clean
 # target: clean
-clean: distclean docsclean
-	rm upload
+clean: dist_clean docs_clean
+	if poetry env info -p; then $(POETRY) env remove python; fi
+	rm -f publish
 
-# target: dev - Install dev-requirements.txt
-dev:
-	$(PIP) install -r dev-requirements.txt
 
-# target: install - Run setup.py to install.
-install:
-	$(PYTHON) setup.py install
+## env #####################
 
-# target: uninstall - Use pip to uninstall.
-uninstall:
-	$(PIP) uninstall resumeback -y
+.PHONY: env
+env: pyproject.toml poetry.lock
 
+.PHONY: test_env
+test_env: env
+	$(POETRY) install -E test $(POETRYOPTS)
+
+.PHONY: flake8_env
+flake8_env: env
+	$(POETRY) install --no-root -E flake8 $(POETRYOPTS)
+
+.PHONY: docs_env
+docs_env: env
+	$(POETRY) install --no-root -E docs $(POETRYOPTS)
 
 ## dist ####################
 
-# target: distclean - clean dist folder.
-distclean:
+.PHONY: dist_clean
+# target: dist_clean - clean dist folder.
+dist_clean:
 	rm -rf dist/*
 
+.PHONY: dist
 # target: dist - Build distribution files (source and binary).
 dist:
-	$(PYTHON) setup.py sdist bdist_wheel
+	$(POETRY) build
 
-# target: upload - Upload dist/ to pypi.
-# dist/resumeback-*.zip dist/resumeback-*.whl
-upload: dist/resumeback-*.zip dist/resumeback-*.whl
-	twine upload $?
-	touch upload
+# target: publish - Upload dist/ to pypi.
+publish: dist/resumeback-*.zip dist/resumeback-*.whl
+	$(POETRY) publish
+	touch publish
 
 
 ## docs ####################
 
-# target: docsinit - Install requirements for building docs.
-docsinit:
-	$(PIP2) install docs/requirements.txt
-
-# target: docsclean - Remove built docs.
-docsclean:
+.PHONY: docs_clean
+# target: docs_clean - Remove built docs.
+docs_clean:
 	rm -rf $(SPHINX_BUILDDIR)/*
 
-# target: html - Build html docs.
-html: $(SPHINX_BUILDDIR)/html
-
-$(SPHINX_BUILDDIR)/html: $(DOCSOURCES)
+$(SPHINX_BUILDDIR)/html: docs_env $(DOCSOURCES)
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(SPHINX_BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(SPHINX_BUILDDIR)/html."
 
+# target: html - Build html docs.
+html: $(SPHINX_BUILDDIR)/html
+
+# target: docs - Alias for `html`.
+docs: html
+
 # TODO docsupload target
 
 
-## other tasks #############
+## test/lint ###############
 
-# target: flake8 - Run flake8 on source.
-flake8:
-	$(FLAKE8) $(FLAKE8OPTS)
+.PHONY: test
+# target: test - Run tests.
+test: test_env
+	$(PYTEST) $(PYTESTOPTS)
 
-# target: test - Run tests (default).
-test:
-	$(PYTEST)
-
-# target: test2 - Run tests (Python 2.7).
-test2:
-	py.test-2.7
-
-# target: coverage - Run tests (default) and report coverage.
-coverage:
+.PHONY: coverage
+# target: coverage - Run tests and report coverage.
+coverage: test_env
 	$(PYTEST) $(ALLCOVOPTS) --cov-report term-missing
 
-# target: htmlcoverage - Run tests (default) and build html coverage report.
-htmlcoverage:
+.PHONY: htmlcoverage
+# target: htmlcoverage - Run tests and build html coverage report.
+htmlcoverage: test_env
 	$(PYTEST) $(ALLCOVOPTS) --cov-report html
 
-
-## CI ######################
-
-# target: ci_install - Initialize CI environment
-ci_install: dev
-ifneq ($(RUN_FLAKE8),1)
-	$(PIP) install coveralls
-endif
-
-# target: ci_script - Perform correct CI action according to env
-ifeq ($(RUN_FLAKE8),1)
-ci_script: flake8
-else
-ci_script: coverage
-endif
-
-# target: ci_after - Perform operations after the script succeeded
-ci_after:
-ifneq ($(RUN_FLAKE8),1)
-	coveralls
-endif
+.PHONY: flake8
+# target: flake8 - Run flake8 on source.
+flake8: flake8_env
+	$(FLAKE8) $(FLAKE8OPTS) .
