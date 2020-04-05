@@ -46,9 +46,10 @@ def test_wrapping():
     attributes = ["__%s__" % a
                   for a in 'doc,name,module,annotations'.split(',')]
 
-    for cls in (send_self,       send_self_return,
-                send_self(True), send_self_return(True)):
-        wrapped = cls(func)
+    for deco in [send_self, send_self_return,
+                 send_self(catch_stopiteration=True), 
+                 send_self_return(catch_stopiteration=True)]:
+        wrapped = deco(func)
         for attr in attributes:
             if hasattr(wrapped, attr):
                 assert getattr(wrapped, attr) == getattr(func, attr)
@@ -168,10 +169,10 @@ def test_parameter():
     'error, func, args, kwargs',
     [
         # "func" arg
-        (ValueError, test_parameter, [], {}),
-        (ValueError, lambda x: x ** 2, [], {}),
-        (ValueError, type, [], {}),
-        # "both" args
+        (TypeError, test_parameter, [], {}),
+        (TypeError, lambda x: x ** 2, [], {}),
+        (TypeError, type, [], {}),
+        # too many args
         (TypeError, None, [type, 1], {}),
         # send_self args
         (TypeError, None, [1], {}),

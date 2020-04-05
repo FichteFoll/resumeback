@@ -294,29 +294,14 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
     __call__ = with_weak_ref
 
 
-class SendSelfMeta(type):
-
-    """Wraps the first argument to a _func kwarg if it's callable."""
-
-    def __call__(cls, *args, **kwargs):  # noqa: N805
-        if args and callable(args[0]):
-            func = args[0]
-            args = args[1:]
-            if args or kwargs:
-                raise TypeError("Invalid usage of send_self")
-        else:
-            func = None
-        return super(SendSelfMeta, cls).__call__(*args, _func=func, **kwargs)
-
-
-class send_self(metaclass=SendSelfMeta):  # noqa: N801
+class send_self:  # noqa: N801
 
     """Decorator that sends a generator a wrapper of itself.
 
     Can be called with parameters or used as a decorator directly.
     """
 
-    def __init__(self, catch_stopiteration=True, finalize_callback=None, debug=False, _func=None):
+    def __init__(self, _func=None, *, catch_stopiteration=True, finalize_callback=None, debug=False):
         # Typechecking
         type_table = [
             ('catch_stopiteration', bool),
@@ -330,7 +315,7 @@ class send_self(metaclass=SendSelfMeta):  # noqa: N801
                                 % (type_, name, type(val)))
 
         if _func and not inspect.isgeneratorfunction(_func):
-            raise ValueError("Callable must be a generatorfunction")
+            raise TypeError("Callable must be a generatorfunction")
 
         self.catch_stopiteration = catch_stopiteration
         self.finalize_callback = finalize_callback
