@@ -6,184 +6,193 @@ from resumeback import (
     WeakGeneratorWrapper,
     StrongGeneratorWrapper
 )
+from random import random
 
 from . import CustomError, State
 
 
-class TestSendSelfEnvironment(object):
+def test_wrapper_type():
+    ts = State()
 
-    def test_wrapper_type(self):
-        ts = State()
+    @send_self
+    def func():
+        this = yield
+        assert type(this) is WeakGeneratorWrapper
+        ts.run = True
 
-        @send_self
-        def func():
-            this = yield
-            assert type(this) is WeakGeneratorWrapper
-            ts.run = True
+    assert type(func() is StrongGeneratorWrapper)
+    assert ts.run
 
-        assert type(func() is StrongGeneratorWrapper)
-        assert ts.run
 
-    def test_send_self_return(self):
-        ts = State()
-        val = 123 + id(self)
+def test_send_self_return():
+    ts = State()
+    val = 123 + random()
 
-        @send_self_return
-        def func():
-            this = yield val
-            assert type(this) is WeakGeneratorWrapper
-            ts.run = True
+    @send_self_return
+    def func():
+        this = yield val
+        assert type(this) is WeakGeneratorWrapper
+        ts.run = True
 
-        assert func() == val
-        assert ts.run
+    assert func() == val
+    assert ts.run
 
-    def test_wrapping(self):
-        def func():
-            """generic docstring"""
-            yield  # pragma: no cover
 
-        attributes = ["__%s__" % a
-                      for a in 'doc,name,module,annotations'.split(',')]
+def test_wrapping():
+    def func():
+        """generic docstring"""
+        yield  # pragma: no cover
 
-        for cls in (send_self,       send_self_return,
-                    send_self(True), send_self_return(True)):
-            wrapped = cls(func)
-            for attr in attributes:
-                if hasattr(wrapped, attr):
-                    assert getattr(wrapped, attr) == getattr(func, attr)
+    attributes = ["__%s__" % a
+                  for a in 'doc,name,module,annotations'.split(',')]
 
-            if hasattr(wrapped, '__wrapped__'):
-                assert wrapped.__wrapped__ is func
+    for cls in (send_self,       send_self_return,
+                send_self(True), send_self_return(True)):
+        wrapped = cls(func)
+        for attr in attributes:
+            if hasattr(wrapped, attr):
+                assert getattr(wrapped, attr) == getattr(func, attr)
 
-    def test_not_catch_stopiteration(self):
-        @send_self(catch_stopiteration=False)
-        def func():
+        if hasattr(wrapped, '__wrapped__'):
+            assert wrapped.__wrapped__ is func
+
+
+def test_not_catch_stopiteration():
+    @send_self(catch_stopiteration=False)
+    def func():
+        yield
+        try:
             yield
-            try:
-                yield
-            except CustomError:
-                pass
-            # Raises StopIteration here
+        except CustomError:
+            pass
+        # Raises StopIteration here
 
-        for meth, args in [('next',  []),
-                           ('send',  [11]),
-                           ('throw', [CustomError])]:
-            w = func()
-            with pytest.raises(StopIteration):
-                getattr(w, meth)(*args)
+    for meth, args in [('next',  []),
+                       ('send',  [11]),
+                       ('throw', [CustomError])]:
+        w = func()
+        with pytest.raises(StopIteration):
+            getattr(w, meth)(*args)
 
-    def test_not_catch_stopiteration_value(self):
-        val = id(self) + 100
 
-        @send_self(catch_stopiteration=False)
-        def func():
+def test_not_catch_stopiteration_value():
+    val = random() + 100
+
+    @send_self(catch_stopiteration=False)
+    def func():
+        yield
+        try:
             yield
-            try:
-                yield
-            except CustomError:
-                pass
-            return val  # Raises StopIteration here
+        except CustomError:
+            pass
+        return val  # Raises StopIteration here
 
-        for meth, args in [('next',  []),
-                           ('send',  [val + 1]),
-                           ('throw', [CustomError])]:
-            w = func()
-            try:
-                getattr(w, meth)(*args)
-            except StopIteration as si:
-                assert si.value == val
-            else:
-                pytest.fail("Did not raise")
+    for meth, args in [('next',  []),
+                       ('send',  [val + 1]),
+                       ('throw', [CustomError])]:
+        w = func()
+        try:
+            getattr(w, meth)(*args)
+        except StopIteration as si:
+            assert si.value == val
+        else:
+            pytest.fail("Did not raise")
 
-    def test_finalize_callback(self):
-        ts = State()
-        ts.called = 0
-        ts.wref = None
 
-        def cb(ref):
-            assert ref is ts.wref
-            assert ref() is None
-            ts.called += 1
+def test_finalize_callback():
+    ts = State()
+    ts.called = 0
+    ts.wref = None
 
-        @send_self(finalize_callback=cb)
-        def func():
-            this = yield
-            ts.wref = this.weak_generator
-            ts.called += 1
-            # Now, terminate and let gc do its work
-
-        func()
-        assert ts.called == 2
-
-    def test_cleanup_return(self):
-        @send_self
-        def func():
-            yield
-            # implicit return
-
-        ref = func().weak_generator
+    def cb(ref):
+        assert ref is ts.wref
         assert ref() is None
+        ts.called += 1
 
-    def test_cleanup_yield(self):
-        @send_self
-        def func():
-            yield
-            yield
+    @send_self(finalize_callback=cb)
+    def func():
+        this = yield
+        ts.wref = this.weak_generator
+        ts.called += 1
+        # Now, terminate and let gc do its work
 
-        ref = func().weak_generator
-        assert ref() is None
+    func()
+    assert ts.called == 2
 
-    def test_yield_return(self):
-        val = ("const", id(self))
 
-        @send_self_return
-        def func():
-            yield val
+def test_cleanup_return():
+    @send_self
+    def func():
+        yield
+        # implicit return
 
-        assert val == func()
+    ref = func().weak_generator
+    assert ref() is None
 
-    def test_parameter(self):
-        ts = State()
-        val = ("const", id(self))
 
-        @send_self
-        def func(param):
-            yield
-            assert param == val
-            ts.run = True
+def test_cleanup_yield():
+    @send_self
+    def func():
+        yield
+        yield
 
-        func(val)
-        assert ts.run
+    ref = func().weak_generator
+    assert ref() is None
 
-    @pytest.mark.parametrize(
-        'error, func, args, kwargs',
-        [
-            # "func" arg
-            (ValueError, test_parameter, [], {}),
-            (ValueError, lambda x: x ** 2, [], {}),
-            (ValueError, type, [], {}),
-            # "both" args
-            (TypeError, None, [type, 1], {}),
-            # send_self args
-            (TypeError, None, [1], {}),
-            (TypeError, None, ["str"], {}),
-            (TypeError, None, [], {'catch_stopiteration': 1}),
-            (TypeError, None, [], {'finalize_callback': 1}),
-            (TypeError, None, [], {'finalize_callback': False}),
-            (TypeError, None, [], {'debug': 1}),
-            # "delayed" func
-            (TypeError, type, [], {'catch_stopiteration': 1}),
-            (ValueError, type, [], {'catch_stopiteration': True}),
-            (RuntimeError, 1, [], {'catch_stopiteration': True}),
-        ]
-    )
-    def test_bad_arguments(self, error, func, args, kwargs):
 
-        with pytest.raises(error):
-            if args or kwargs:
-                ss = send_self(*args, **kwargs)
-            else:
-                ss = send_self
+def test_yield_return():
+    val = ("const", random())
 
-            assert func is not None  # Otherwise should have raised by now
-            ss(func)
+    @send_self_return
+    def func():
+        yield val
+
+    assert val == func()
+
+
+def test_parameter():
+    ts = State()
+    val = ("const", random())
+
+    @send_self
+    def func(param):
+        yield
+        assert param == val
+        ts.run = True
+
+    func(val)
+    assert ts.run
+
+
+@pytest.mark.parametrize(
+    'error, func, args, kwargs',
+    [
+        # "func" arg
+        (ValueError, test_parameter, [], {}),
+        (ValueError, lambda x: x ** 2, [], {}),
+        (ValueError, type, [], {}),
+        # "both" args
+        (TypeError, None, [type, 1], {}),
+        # send_self args
+        (TypeError, None, [1], {}),
+        (TypeError, None, ["str"], {}),
+        (TypeError, None, [], {'catch_stopiteration': 1}),
+        (TypeError, None, [], {'finalize_callback': 1}),
+        (TypeError, None, [], {'finalize_callback': False}),
+        (TypeError, None, [], {'debug': 1}),
+        # "delayed" func
+        (TypeError, type, [], {'catch_stopiteration': 1}),
+        (ValueError, type, [], {'catch_stopiteration': True}),
+        (RuntimeError, 1, [], {'catch_stopiteration': True}),
+    ]
+)
+def test_bad_arguments(error, func, args, kwargs):
+
+    with pytest.raises(error):
+        if args or kwargs:
+            ss = send_self(*args, **kwargs)
+        else:
+            ss = send_self
+
+        assert func is not None  # Otherwise should have raised by now
+        ss(func)
