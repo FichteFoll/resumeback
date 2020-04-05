@@ -301,14 +301,14 @@ class send_self:  # noqa: N801
     Can be called with parameters or used as a decorator directly.
     """
 
-    def __init__(self, _func=None, *, catch_stopiteration=True, finalize_callback=None, debug=False):
+    def __init__(self, func=None, *, catch_stopiteration=True, finalize_callback=None, debug=False):
         # Typechecking
         type_table = [
             ('catch_stopiteration', bool),
             ('debug', bool),
             ('finalize_callback', (Callable, type(None)))
         ]
-        if _func is not None and not inspect.isgeneratorfunction(_func):
+        if func is not None and not inspect.isgeneratorfunction(func):
             raise TypeError("Callable must be a generatorfunction")
 
         for name, type_ in type_table:
@@ -320,11 +320,11 @@ class send_self:  # noqa: N801
         self.catch_stopiteration = catch_stopiteration
         self.finalize_callback = finalize_callback
         self.debug = debug
-        self._func = _func
+        self.func = func
 
-        # Wrap _func if it was specified
-        if _func:
-            update_wrapper(self, _func)
+        # Wrap func if it was specified
+        if func:
+            update_wrapper(self, func)
 
     def _start_generator(self, generator):
         # Start generator
@@ -345,18 +345,18 @@ class send_self:  # noqa: N801
 
     def __call__(self, *args, **kwargs):
         # Second part of decorator usage, i.e. `@send_self(True) \n def ...`
-        if not self._func:
+        if not self.func:
             if not args or not callable(args[0]):
                 raise RuntimeError("send_self wrapper has not properly been initialized yet")
             else:
                 if not inspect.isgeneratorfunction(args[0]):
                     raise ValueError("Callable must be a generatorfunction")
-                self._func = args[0]
-                update_wrapper(self, self._func)
+                self.func = args[0]
+                update_wrapper(self, self.func)
                 return self
 
         # Create generator
-        generator = self._func(*args, **kwargs)
+        generator = self.func(*args, **kwargs)
 
         return self._start_generator(generator)
 
@@ -374,10 +374,10 @@ class send_self_return(send_self):  # noqa: N801
         weak_generator = weakref.ref(generator, self.finalize_callback)
 
         # Build wrapper and send to the generator
-        gen_wrapper = WeakGeneratorWrapper(
+        weak_gen_wrapper = WeakGeneratorWrapper(
             weak_generator,
             self.catch_stopiteration,
             self.debug
         )
-        gen_wrapper.send(gen_wrapper)
+        weak_gen_wrapper.send(weak_gen_wrapper)
         return ret_value
