@@ -24,7 +24,7 @@ that enables using callback-based interfaces
 in **a single line of execution**
 -- a single function.
 
-Full docs are available here: http://fichtefoll.github.io/resumeback/
+Full docs are available here: https://fichtefoll.github.io/resumeback/
 
 
 Installation
