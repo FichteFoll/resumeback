@@ -172,6 +172,7 @@ def test_parameter():
         (TypeError, test_parameter, [], {}),
         (TypeError, lambda x: x ** 2, [], {}),
         (TypeError, type, [], {}),
+        (TypeError, False, [], {}),
         # too many args
         (TypeError, None, [type, 1], {}),
         # send_self args

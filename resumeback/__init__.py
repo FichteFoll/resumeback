@@ -308,14 +308,14 @@ class send_self:  # noqa: N801
             ('debug', bool),
             ('finalize_callback', (Callable, type(None)))
         ]
+        if _func is not None and not inspect.isgeneratorfunction(_func):
+            raise TypeError("Callable must be a generatorfunction")
+
         for name, type_ in type_table:
             val = locals()[name]
             if not isinstance(val, type_):
                 raise TypeError("Expected %s for parameter '%s', got %s"
                                 % (type_, name, type(val)))
-
-        if _func and not inspect.isgeneratorfunction(_func):
-            raise TypeError("Callable must be a generatorfunction")
 
         self.catch_stopiteration = catch_stopiteration
         self.finalize_callback = finalize_callback
