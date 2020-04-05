@@ -1,8 +1,5 @@
 """Library for using callbacks to resume your code."""
 
-from __future__ import print_function
-
-
 from collections.abc import Callable
 from functools import partial, update_wrapper
 import inspect
@@ -11,7 +8,7 @@ import time
 import weakref
 
 
-__version__ = "0.1.0"
+__version__ = "0.2.0dev0"
 
 version_info = __version__.split('.')
 
