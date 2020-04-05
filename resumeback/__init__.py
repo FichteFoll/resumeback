@@ -3,17 +3,12 @@
 from __future__ import print_function
 
 
+from collections.abc import Callable
 from functools import partial, update_wrapper
 import inspect
-import sys
 import threading
 import time
 import weakref
-
-if sys.version_info < (3,):
-    import collections as c_abc
-else:
-    from collections import abc as c_abc
 
 
 __version__ = "0.1.0"
@@ -29,14 +24,6 @@ __all__ = (
     'StrongGeneratorWrapper',
     'WaitTimeoutError',
 )
-
-
-# Use this compat method to create a dummy class
-# that other classes can be subclassed from.
-# This allows specifying a metaclass for both Py2 and Py3 with the same syntax.
-def with_metaclass(meta, *bases):
-    """Create a base class with a metaclass (for subclassing)."""
-    return meta("_" + meta.__name__, bases or (object,), {})
 
 
 class WaitTimeoutError(RuntimeError):
@@ -325,7 +312,7 @@ class SendSelfMeta(type):
         return super(SendSelfMeta, cls).__call__(*args, _func=func, **kwargs)
 
 
-class send_self(with_metaclass(SendSelfMeta)):  # noqa: N801
+class send_self(metaclass=SendSelfMeta):  # noqa: N801
 
     """Decorator that sends a generator a wrapper of itself.
 
@@ -337,7 +324,7 @@ class send_self(with_metaclass(SendSelfMeta)):  # noqa: N801
         type_table = [
             ('catch_stopiteration', bool),
             ('debug', bool),
-            ('finalize_callback', (c_abc.Callable, type(None)))
+            ('finalize_callback', (Callable, type(None)))
         ]
         for name, type_ in type_table:
             val = locals()[name]

@@ -69,6 +69,20 @@ class TestSendSelfDeferring(object):
         wait_until_finished(func())
         assert ts.run
 
+    def test_throw_return(self):
+        val = 2 + id(self)
+
+        @send_self
+        def func():
+            yield
+            try:
+                yield
+            except CustomError:
+                return val
+
+        wrapper = func()
+        assert val == wrapper.throw(CustomError)
+
     def test_close(self):
         ts = State()
 
