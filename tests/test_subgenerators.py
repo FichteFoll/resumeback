@@ -62,11 +62,13 @@ def test_subgenerator_repurpose():
     @send_self
     def func2(this):
         assert (yield defer(this.send, val)) == val
-        ts.run = True
+        return val + 2
 
     @send_self
     def func(this):
-        yield from func2.func(this)
+        ret = yield from func2.func(this)
+        assert ret == val + 2
+        ts.run = True
 
     wrapper = func()
     wait_until_finished(wrapper)
