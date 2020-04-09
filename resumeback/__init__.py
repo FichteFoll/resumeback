@@ -16,8 +16,7 @@ __author__ = "FichteFoll <fichtefoll2@googlemail.com>"
 
 __all__ = (
     'send_self',
-    'send_self_return',
-    'WeakGeneratorWrapper',
+    'GeneratorWrapper',
     'StrongGeneratorWrapper',
     'WaitTimeoutError',
 )
@@ -28,7 +27,7 @@ class WaitTimeoutError(RuntimeError):
     pass
 
 
-class WeakGeneratorWrapper(object):
+class GeneratorWrapper(object):
 
     """Wraps a weak reference to a generator and adds convenience features."""
 
@@ -65,7 +64,7 @@ class WeakGeneratorWrapper(object):
         return StrongGeneratorWrapper(self.generator, *self._args)
 
     def with_weak_ref(self):
-        """Get a WeakGeneratorWrapper with the same attributes."""
+        """Get a (Weak)GeneratorWrapper with the same attributes."""
         return self
 
     # Utility and shorthand functions/methods
@@ -243,18 +242,18 @@ class WeakGeneratorWrapper(object):
                 and gen.gi_frame is not None)
 
     def __eq__(self, other):
-        if type(other) is WeakGeneratorWrapper:
+        if type(other) is GeneratorWrapper:
             return self._args == other._args
         return NotImplemented
 
     __call__ = with_strong_ref
 
 
-class StrongGeneratorWrapper(WeakGeneratorWrapper):
+class StrongGeneratorWrapper(GeneratorWrapper):
 
     """Wraps a generator and adds convenience features."""
 
-    generator = None  # Override property of WeakGeneratorWrapper
+    generator = None  # Override property of GeneratorWrapper
 
     def __init__(self, generator, weak_generator=None, *args, **kwargs):
         """__init__
@@ -265,7 +264,7 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
         :type weak_generator: weakref.ref
         :param weak_generator: Weak reference to a generator. Optional.
 
-        For other parameters see :meth:`WeakGeneratorWrapper.__init__`.
+        For other parameters see :meth:`GeneratorWrapper.__init__`.
         """
         # It's important that the weak_generator object reference is preserved
         # because it will hold `finalize_callback` from @send_self.
@@ -282,8 +281,8 @@ class StrongGeneratorWrapper(WeakGeneratorWrapper):
         return self
 
     def with_weak_ref(self):
-        """Get a WeakGeneratorWrapper with the same attributes."""
-        return WeakGeneratorWrapper(*self._args)
+        """Get a (Weak)GeneratorWrapper with the same attributes."""
+        return GeneratorWrapper(*self._args)
 
     def __eq__(self, other):
         if type(other) is StrongGeneratorWrapper:

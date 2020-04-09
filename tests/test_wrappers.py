@@ -3,7 +3,7 @@ from __future__ import print_function
 import time
 import weakref
 
-from resumeback import send_self, StrongGeneratorWrapper, WeakGeneratorWrapper
+from resumeback import send_self, StrongGeneratorWrapper, GeneratorWrapper
 
 from . import defer, State
 
@@ -13,7 +13,7 @@ def test_constructors():
         yield  # pragma: no cover
     generator = func()
     wrappers = [StrongGeneratorWrapper(generator),
-                WeakGeneratorWrapper(weakref.ref(generator))]
+                GeneratorWrapper(weakref.ref(generator))]
 
     for wrapper in wrappers:
         assert type(wrapper.weak_generator) is weakref.ref
@@ -28,11 +28,11 @@ def test_equal():
     generator = func()
     assert (StrongGeneratorWrapper(generator)
             == StrongGeneratorWrapper(generator))
-    assert (WeakGeneratorWrapper(weakref.ref(generator))
-            == WeakGeneratorWrapper(weakref.ref(generator)))
+    assert (GeneratorWrapper(weakref.ref(generator))
+            == GeneratorWrapper(weakref.ref(generator)))
 
     assert (StrongGeneratorWrapper(generator)
-            != WeakGeneratorWrapper(weakref.ref(generator)))
+            != GeneratorWrapper(weakref.ref(generator)))
 
 
 def test_with_weak_ref():
@@ -53,9 +53,9 @@ def test_with_weak_ref():
             this.with_strong_ref().with_strong_ref().with_weak_ref(),
             this()()
         ]
-        comp_ref = WeakGeneratorWrapper(weakref.ref(this.generator))
+        comp_ref = GeneratorWrapper(weakref.ref(this.generator))
         for i, that in enumerate(thises):
-            assert type(that) is WeakGeneratorWrapper, i
+            assert type(that) is GeneratorWrapper, i
             assert that == this
 
             assert that.weak_generator is this.weak_generator

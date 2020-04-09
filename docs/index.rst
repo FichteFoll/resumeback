@@ -153,7 +153,7 @@ The Generator Wrapper
 
 Instead of being called with the generator instance directly,
 it is wrapped in a convenience class
-named :class:`~resumeback.WeakGeneratorWrapper`.
+named :class:`~resumeback.GeneratorWrapper`.
 
 The wrapper wraps all interacting methods
 and catches :exc:`StopIteration` exceptions,

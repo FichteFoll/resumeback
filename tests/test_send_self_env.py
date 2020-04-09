@@ -2,7 +2,7 @@ import pytest
 
 from resumeback import (
     send_self,
-    WeakGeneratorWrapper,
+    GeneratorWrapper,
     StrongGeneratorWrapper
 )
 from random import random
@@ -15,7 +15,7 @@ def test_wrapper_type():
 
     @send_self
     def func(this):
-        assert type(this) is WeakGeneratorWrapper
+        assert type(this) is GeneratorWrapper
         ts.run = True
         yield
 
@@ -30,7 +30,7 @@ def test_send_self_return():
     def func():
         @send_self
         def internal(this):
-            assert type(this) is WeakGeneratorWrapper
+            assert type(this) is GeneratorWrapper
             ts.run = True
             yield
         internal()

@@ -32,7 +32,7 @@
 
    When a generator decorated by this is called,
    it receives a wrapper of its instance as the first parameter.
-   The wrapper is an instance of :class:`WeakGeneratorWrapper`.
+   The wrapper is an instance of :class:`GeneratorWrapper`.
    The function then returns said wrapper.
 
    Useful for creating generators
@@ -97,7 +97,7 @@
 Wrappers
 ========
 
-.. class:: WeakGeneratorWrapper(weak_generator, catch_stopiteration=True, debug=False)
+.. class:: GeneratorWrapper(weak_generator, catch_stopiteration=True, debug=False)
 
    Wraps a weak reference to a generator and adds convenience features.
 
@@ -192,7 +192,7 @@ Wrappers
 
    .. method:: with_weak_ref()
 
-      Get a :class:`WeakGeneratorWrapper` with the same attributes.
+      Get a :class:`GeneratorWrapper` with the same attributes.
 
    .. method:: next_wait(timeout=None)
 
@@ -376,7 +376,7 @@ Wrappers
 
    Wraps a generator and adds convenience features.
 
-   Operates similar to :class:`WeakGeneratorWrapper`,
+   Operates similar to :class:`GeneratorWrapper`,
    except that it holds a strong reference to the generator.
    Use this class
    if you want to pass the generator wrapper itself around,
