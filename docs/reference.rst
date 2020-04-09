@@ -27,7 +27,7 @@
 .. decorator:: send_self
 .. decorator:: send_self(catch_stopiteration=True, finalize_callback=None, debug=False)
 
-   Decorator that sends a "generatorfunction" a wrapper of itself.
+   Decorator that sends a "generator function" a wrapper of itself.
 
    Can be called with parameters or used as a decorator directly.
 
@@ -81,13 +81,13 @@
    :raises TypeError:
       If the parameters are not of types as specified.
    :raises ValueError:
-      If the callable is not a generator.
+      If the callable is not a generator function.
 
 
 .. decorator:: send_self_return
 .. decorator:: send_self_return(catch_stopiteration=True, finalize_callback=None, debug=False)
 
-   Decorator that sends a "generatorfunction" a wrapper of itself.
+   Decorator that sends a "generator function" a wrapper of itself.
 
    Behaves exactly like :func:`send_self`,
    except that it returns the first yielded value

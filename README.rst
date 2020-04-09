@@ -38,7 +38,7 @@ Installation
 Usage
 =====
 
-``resumeback.send_self``'s mechanic of sending a generator function
+:func:`resumeback.send_self`'s mechanic of sending a generator function
 a handle to itself
 is what allows for better flow control
 using callback-based interfaces.
@@ -60,7 +60,7 @@ to signal that user input has been made:
 
 The *traditional* way of using a function like ``ask_for_user_input`` would be
 to define a function of some way,
-either as a closure or using ``functools.partial`` so that we can preserve
+either as a closure or using :func:`functools.partial` so that we can preserve
 the state we already accumulated prior to executing said function.
 
 For example like so:
@@ -82,7 +82,7 @@ because we are jumping from the function call of ``ask_for_user_input``
 back to our previously defined function ``on_done``
 -- which is only ever going to be called once in this context.
 
-However, using ``resumeback.send_self``,
+However, using :func:`resumeback.send_self`,
 we can do something to *flatten our line of execution*
 by passing a callback to resume execution in our original function:
 

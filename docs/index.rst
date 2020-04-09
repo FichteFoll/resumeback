@@ -26,14 +26,16 @@ Installation
 Usage
 =====
 
-``resumeback.send_self``'s mechanic of sending a generator function
+:func:`resumeback.send_self`'s mechanic of sending a generator function
 a handle to itself
 is what allows for better flow control
 using callback-based interfaces.
 Essentially, it enables *a single line of execution*.
 
 Following is a function that uses an asynchronous callback mechanism
-to signal that user input has been made::
+to signal that user input has been made:
+
+.. code-block:: python
 
    from threading import Thread
 
@@ -46,10 +48,12 @@ to signal that user input has been made::
 
 The *traditional* way of using a function like ``ask_for_user_input`` would be
 to define a function of some way,
-either as a closure or using ``functools.partial`` so that we can preserve
+either as a closure or using :func:`functools.partial` so that we can preserve
 the state we already accumulated prior to executing said function.
 
-For example like so::
+For example like so:
+
+.. code-block:: python
 
    def main():
        arbitrary_value = 10
@@ -66,9 +70,11 @@ because we are jumping from the function call of ``ask_for_user_input``
 back to our previously defined function ``on_done``
 -- which is only ever going to be called once in this context.
 
-However, using ``resumeback.send_self``,
+However, using :func:`resumeback.send_self`,
 we can do something to *flatten our line of execution*
-by passing a callback to resume execution in our original function::
+by passing a callback to resume execution in our original function:
+
+.. code-block:: python
 
    from resumeback import send_self
 
@@ -87,7 +93,7 @@ by passing a callback to resume execution in our original function::
 How it works
 ============
 
-``resumeback.send_self`` operates on generators
+:func:`resumeback.send_self` operates on generators
 and their possibility of sending arbitrary data to them
 whereever they paused execution.
 Upon calling a generator function decorated with ``@resumeback.send_self``,
@@ -111,7 +117,7 @@ and ``*_wait_async`` variants to also wait until the generator can be resumed,
 but do so in a non-blocking way.
 
 Additionally,
-the wrapper catches ``StopIteration`` exceptions in these three methods,
+the wrapper catches :exc:`StopIteration` exceptions in these three methods,
 so that termination of the generator
 (due to returning a value or just reaching the end)
 does not raise an exception in the caller's code,
