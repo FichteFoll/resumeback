@@ -9,11 +9,9 @@ class CustomError(Exception):
     pass
 
 
-def defer(callback, *args, **kwargs):
-    sleep = kwargs.pop('sleep', DEFAULT_SLEEP)
-    expected_return = kwargs.pop('expected_return', None)
-    call = kwargs.pop('call', True)
-
+def defer(callback, *args,
+          sleep=DEFAULT_SLEEP, expected_return=None, call=True,
+          **kwargs):
     def func():
         time.sleep(sleep)
         if call:
