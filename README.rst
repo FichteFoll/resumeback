@@ -2,8 +2,8 @@
  resumeback
 ============
 
-.. image:: https://travis-ci.org/FichteFoll/resumeback.svg
-   :target: https://travis-ci.org/FichteFoll/resumeback
+.. image:: https://github.com/FichteFoll/resumeback/workflows/CI/badge.svg
+   :target: https://github.com/FichteFoll/resumeback/actions?query=workflow%3ACI+branch%3Amaster
 
 .. image:: https://coveralls.io/repos/FichteFoll/resumeback/badge.svg
    :target: https://coveralls.io/github/FichteFoll/resumeback?branch=master
