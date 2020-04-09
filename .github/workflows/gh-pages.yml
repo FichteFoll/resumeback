@@ -1,0 +1,52 @@
+name: Github Pages
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/gh-pages.yml
+      - Makefile
+      - poetry.lock
+      - docs/*
+
+env:
+  POETRY_VERSION: 1.0.5
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.x
+
+      - name: Install poetry
+        uses: dschep/install-poetry-action@v1.3
+        with:
+          version: ${{ env.POETRY_VERSION }}
+
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v1
+        id: cache
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: poetry-docs-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install docs dependencies
+        run: make -e docs_env
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      - name: Build Docs
+        run: |
+          make -e docs
+          touch sphinx_build/html/.nojekyll
+
+      - name: Deploy Docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          publish_dir: sphinx_build/html
