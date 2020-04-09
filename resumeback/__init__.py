@@ -36,8 +36,6 @@ class GeneratorWrapper(object):
         self.catch_stopiteration = catch_stopiteration
         self.debug = debug
 
-        self._args = (weak_generator, catch_stopiteration, debug)
-
         # We use this lock
         # so that the '*_wait' methods do not get screwed
         # after checking `generator.gi_running`
@@ -53,6 +51,11 @@ class GeneratorWrapper(object):
     def __del__(self):
         if self.debug:
             print("Wrapper is being deleted", self)
+
+    @property
+    def _args(self):
+        """Provide a dynamic view of this instance's attributes."""
+        return (self.weak_generator, self.catch_stopiteration, self.debug)
 
     @property
     def generator(self):
