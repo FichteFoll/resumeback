@@ -1,78 +1,80 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Introduction &mdash; resumeback 0.1.0 documentation</title>
-    
+    <meta charset="utf-8" />
+    <title>Introduction &#8212; resumeback  documentation</title>
     <link rel="stylesheet" href="_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.1.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="resumeback 0.1.0 documentation" href="#" />
-    <link rel="next" title="Introduction" href="" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Reference" href="reference.html" />
    
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
-  </head>
-  <body>
+  </head><body>
   
   
   <div class="indexwrapper">
   
 
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="#" title="Introduction"
+          <a href="reference.html" title="Reference"
              accesskey="N">next</a> |</li>
-        <li><a href="#">resumeback 0.1.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="#">resumeback  documentation</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>A Python library for using callbacks to resume your code.</p>
-<p><tt class="docutils literal"><span class="pre">resumeback</span></tt> provides a utility function decorator
+<h1><a class="toc-backref" href="#id2">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>A Python 3 library for using callbacks to resume your code.</p>
+<p><code class="docutils literal notranslate"><span class="pre">resumeback</span></code> provides a utility function decorator
 that enables using callback-based interfaces
 in <strong>a single line of execution</strong>
-&#8211; a single function.</p>
-<div class="toctree-wrapper compound">
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference.html">Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#how-it-works">How it works</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#code">Code</a></li>
+– a single function.</p>
+<p>The source code is available on GitHub under the MIT license:
+<a class="reference external" href="https://github.com/FichteFoll/resumeback">https://github.com/FichteFoll/resumeback</a></p>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#introduction" id="id2">Introduction</a></p>
+<ul>
+<li><p><a class="reference internal" href="#installation" id="id3">Installation</a></p></li>
+<li><p><a class="reference internal" href="#usage" id="id4">Usage</a></p>
+<ul>
+<li><p><a class="reference internal" href="#methods" id="id5">Methods</a></p></li>
+<li><p><a class="reference internal" href="#generators" id="id6">Generators</a></p></li>
+<li><p><a class="reference internal" href="#the-generator-wrapper" id="id7">The Generator Wrapper</a></p></li>
+<li><p><a class="reference internal" href="#preventing-race-conditions" id="id8">Preventing Race Conditions</a></p></li>
+<li><p><a class="reference internal" href="#subgenerators" id="id9">Subgenerators</a></p></li>
 </ul>
 </li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#resume-back-module"><tt class="docutils literal"><span class="pre">resume_back</span></tt> module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#send-self-decorator"><tt class="docutils literal"><span class="pre">&#64;send_self</span></tt> decorator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html#resume-back-module"><code class="docutils literal notranslate"><span class="pre">resume_back</span></code> module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html#send-self-decorator"><code class="docutils literal notranslate"><span class="pre">&#64;send_self</span></code> decorator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html#wrappers">Wrappers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html#exceptions">Exceptions</a></li>
 </ul>
@@ -80,21 +82,21 @@ in <strong>a single line of execution</strong>
 </ul>
 </div>
 <div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-shell"><div class="highlight"><pre><span class="nv">$ </span>pip install resumeback
+<h2><a class="toc-backref" href="#id3">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pip install resumeback
 </pre></div>
 </div>
 </div>
 <div class="section" id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">resumeback.send_self</span></tt>&#8216;s mechanic of sending a generator function
-a handle to itself
-is what allows for better flow control
+<h2><a class="toc-backref" href="#id4">Usage</a><a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="reference.html#resumeback.send_self" title="resumeback.send_self"><code class="xref py py-func docutils literal notranslate"><span class="pre">resumeback.send_self()</span></code></a>’s mechanic of providing a generator function
+with a handle to its running instance
+allows for better flow control
 using callback-based interfaces.
 Essentially, it enables <em>a single line of execution</em>.</p>
 <p>Following is a function that uses an asynchronous callback mechanism
 to signal that user input has been made:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
 
 <span class="k">def</span> <span class="nf">ask_for_user_input</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="n">on_done</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">watcher</span><span class="p">():</span>
@@ -104,83 +106,154 @@ to signal that user input has been made:</p>
     <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">watcher</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>The <em>traditional</em> way of using a function like <tt class="docutils literal"><span class="pre">ask_for_user_input</span></tt> would be
+<p>The <em>traditional</em> way of using a function like <code class="docutils literal notranslate"><span class="pre">ask_for_user_input</span></code> would be
 to define a function of some way,
-either as a closure or using <tt class="docutils literal"><span class="pre">functools.partial</span></tt> so that we can preserve
-the state we already accumulated prior to executing said function.</p>
-<p>For example like so:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+either as a closure or using <code class="xref py py-func docutils literal notranslate"><span class="pre">functools.partial()</span></code>,
+so that we can preserve the state we already accumulated
+prior to executing said function.</p>
+<p>For example, like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">arbitrary_value</span> <span class="o">=</span> <span class="mi">10</span>
 
     <span class="k">def</span> <span class="nf">on_done</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
         <span class="n">number</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Result:&quot;</span><span class="p">,</span> <span class="n">number</span> <span class="o">*</span> <span class="n">arbitrary_value</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Result:&quot;</span><span class="p">,</span> <span class="n">number</span> <span class="o">*</span> <span class="n">arbitrary_value</span><span class="p">)</span>
 
-    <span class="n">ask_for_user_input</span><span class="p">(</span><span class="s">&quot;Please enter a number&quot;</span><span class="p">,</span> <span class="n">on_done</span><span class="p">)</span>
+    <span class="n">ask_for_user_input</span><span class="p">(</span><span class="s2">&quot;Please enter a number&quot;</span><span class="p">,</span> <span class="n">on_done</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Because Python does not have multi-line inline functions,
 this is rather awkward,
-because we are jumping from the function call of <tt class="docutils literal"><span class="pre">ask_for_user_input</span></tt>
-back to our previously defined function <tt class="docutils literal"><span class="pre">on_done</span></tt>
-&#8211; which is only ever going to be called once in this context.</p>
-<p>However, using <tt class="docutils literal"><span class="pre">resumeback.send_self</span></tt>,
-we can do something to <em>flatten our line of execution</em>
+since we are jumping from the function call of <code class="docutils literal notranslate"><span class="pre">ask_for_user_input</span></code>
+back to our previously defined function <code class="docutils literal notranslate"><span class="pre">on_done</span></code>
+– which is only ever going to be called once in this context.</p>
+<p>However, using <a class="reference internal" href="reference.html#resumeback.send_self" title="resumeback.send_self"><code class="xref py py-func docutils literal notranslate"><span class="pre">resumeback.send_self()</span></code></a>,
+we can <em>flatten our line of execution</em>
 by passing a callback to resume execution in our original function:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">resumeback</span> <span class="kn">import</span> <span class="n">send_self</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">resumeback</span> <span class="kn">import</span> <span class="n">send_self</span>
 
 <span class="nd">@send_self</span>
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">this</span> <span class="o">=</span> <span class="k">yield</span>  <span class="c"># &quot;this&quot; is now a reference to the just-created generator</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">this</span><span class="p">):</span>  <span class="c1"># &quot;this&quot; is a reference to the created generator instance</span>
     <span class="n">arbitrary_value</span> <span class="o">=</span> <span class="mi">10</span>
 
-    <span class="c"># Yield pauses execution until one of the generator methods is called,</span>
-    <span class="c"># such as `.send`, which we provide as the callback parameter.</span>
-    <span class="n">number</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">ask_for_user_input</span><span class="p">(</span><span class="s">&quot;Please enter a number&quot;</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">send</span><span class="p">)</span>
-    <span class="n">number</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Result:&quot;</span><span class="p">,</span> <span class="n">number</span> <span class="o">*</span> <span class="n">arbitrary_value</span><span class="p">)</span>
+    <span class="c1"># Yield pauses execution until one of the generator methods is called,</span>
+    <span class="c1"># such as `.send`, which we provide as the callback parameter.</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">ask_for_user_input</span><span class="p">(</span><span class="s2">&quot;Please enter a number&quot;</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">send</span><span class="p">)</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Result:&quot;</span><span class="p">,</span> <span class="n">number</span> <span class="o">*</span> <span class="n">arbitrary_value</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The function decorated by <a class="reference internal" href="reference.html#resumeback.send_self" title="resumeback.send_self"><code class="xref py py-func docutils literal notranslate"><span class="pre">send_self()</span></code></a>
+will be called with the wrapper to the created generator instance
+as the first parameter.</p>
+<div class="section" id="methods">
+<h3><a class="toc-backref" href="#id5">Methods</a><a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="reference.html#resumeback.send_self" title="resumeback.send_self"><code class="xref py py-func docutils literal notranslate"><span class="pre">send_self()</span></code></a> decorator can be used on methods,
+classmethods and staticmethods as well.
+For methods, they behave as you would expect.
+For class- or staticmethods, you must ensure
+that you put the method decorator <em>above</em> <a class="reference internal" href="reference.html#resumeback.send_self" title="resumeback.send_self"><code class="xref py py-func docutils literal notranslate"><span class="pre">send_self()</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">resumeback</span> <span class="kn">import</span> <span class="n">send_self</span>
+
+<span class="k">class</span> <span class="nc">Class</span><span class="p">:</span>
+    <span class="nd">@send_self</span>
+    <span class="k">def</span> <span class="nf">method</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>  <span class="c1"># do things with `self`</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="nd">@send_self</span>
+    <span class="k">def</span> <span class="nf">clsmethod</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+        <span class="k">pass</span>  <span class="c1"># do things with `cls`</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="how-it-works">
-<h2>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">resumeback.send_self</span></tt> operates on generators
+<div class="section" id="generators">
+<h3><a class="toc-backref" href="#id6">Generators</a><a class="headerlink" href="#generators" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="reference.html#resumeback.send_self" title="resumeback.send_self"><code class="xref py py-func docutils literal notranslate"><span class="pre">resumeback.send_self()</span></code></a> operates on generators
 and their possibility of sending arbitrary data to them
-whereever they paused execution.
-Upon calling a generator function decorated with <tt class="docutils literal"><span class="pre">&#64;resumeback.send_self</span></tt>,
-it is executed until the first <tt class="docutils literal"><span class="pre">yield</span></tt> statement.
-Immediately following,
-the generator gets sent a wrapper to itself so it may delegate its execution
-environment however it wishes.</p>
-<p>Generators in Python provide four methods for interacting with them:</p>
+wherever they paused execution.
+Calling a generator function decorated with <code class="docutils literal notranslate"><span class="pre">&#64;resumeback.send_self</span></code>
+results in the function receiving the created generator instance object
+as its first argument.
+The generator may then delegate its execution environment
+however it desires.</p>
+<p>For this delegation,
+generators in Python provide four methods for interacting with them:</p>
 <ol class="arabic simple">
-<li>next &#8211; to just resume execution
-(this is available on Python 3 via <tt class="docutils literal"><span class="pre">next(generator)</span></tt>)</li>
-<li>send &#8211; to resume execution and additionally send any value to it</li>
-<li>throw &#8211; to raise an exception at the position the generator paused</li>
-<li>close &#8211; to close the generator</li>
+<li><p><strong>next</strong> – to just resume execution (used as <code class="docutils literal notranslate"><span class="pre">next(generator)</span></code>)</p></li>
+<li><p><strong>send</strong> – to resume execution and additionally send any value to it</p></li>
+<li><p><strong>throw</strong> – to raise an exception at the position the generator paused</p></li>
+<li><p><strong>close</strong> – to close the generator</p></li>
 </ol>
-<p>For the first three methods,
-the wrapper additionally defines <tt class="docutils literal"><span class="pre">*_wait</span></tt> method variants,
-which will block execution until the generator can actually be resumed,
-and <tt class="docutils literal"><span class="pre">*_wait_async</span></tt> variants to also wait until the generator can be resumed,
-but do so in a non-blocking way.</p>
-<p>Additionally,
-the wrapper catches <tt class="docutils literal"><span class="pre">StopIteration</span></tt> exceptions in these three methods,
+<p>Note that any remaining <code class="docutils literal notranslate"><span class="pre">finally</span></code> blocks wrapping a paused <code class="docutils literal notranslate"><span class="pre">yield</span></code>
+will be called when the generator is deleted.</p>
+</div>
+<div class="section" id="the-generator-wrapper">
+<h3><a class="toc-backref" href="#id7">The Generator Wrapper</a><a class="headerlink" href="#the-generator-wrapper" title="Permalink to this headline">¶</a></h3>
+<p>Instead of being called with the generator instance directly,
+it is wrapped in a convenience class
+named <a class="reference internal" href="reference.html#resumeback.GeneratorWrapper" title="resumeback.GeneratorWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeneratorWrapper</span></code></a>.</p>
+<p>The wrapper wraps all interacting methods
+and catches <code class="xref py py-exc docutils literal notranslate"><span class="pre">StopIteration</span></code> exceptions,
 so that termination of the generator
 (due to returning a value or just reaching the end)
-does not raise an exception in the caller&#8217;s code,
-which is most likely a function like <tt class="docutils literal"><span class="pre">ask_for_user_input</span></tt>.
-You can disable this whenever you want.</p>
-<p>And finally,
-the wrapper contains a weak reference to the generator,
+does not raise an exception in the caller’s code.
+This can be disabled dynamically.</p>
+<p>It further only holds a weak reference to the generator,
 which prevents reference cycles
 due to the generator not holding a reference to itself.
-This is but an optimization.</p>
+When accessing a resuming function to provide as a callback,
+a strong reference for the generator is created
+to ensure it does not get cleaned up
+while it waits for that to be called.
+This is but an optimization.
+A strongly referencing wrapper is available on-demand.</p>
 </div>
-<div class="section" id="code">
-<h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
-<p>The code is available on github: <a class="reference external" href="https://github.com/FichteFoll/resumeback">https://github.com/FichteFoll/resumeback</a></p>
+<div class="section" id="preventing-race-conditions">
+<h3><a class="toc-backref" href="#id8">Preventing Race Conditions</a><a class="headerlink" href="#preventing-race-conditions" title="Permalink to this headline">¶</a></h3>
+<p>Because threads can be interrupted at any point in a non-atomic operation,
+it is possible that a generator could be attempted to be resumed
+before it has paused from the following <code class="docutils literal notranslate"><span class="pre">yield</span></code> keyword.
+To prevent this, the wrapper provides <code class="docutils literal notranslate"><span class="pre">*_wait</span></code> methods.
+These behave exactly like their normal counterparts
+with the addition of a <code class="docutils literal notranslate"><span class="pre">timeout</span></code> parameter
+and a busy poll for whether the generator is in a paused state.</p>
+<p>However, when the provided callback to resume the generator is called immediately,
+it will never have had the chance to pause itself.
+For convenience in these situations,
+the wrapper object provides <code class="docutils literal notranslate"><span class="pre">*_wait_async</span></code> methods
+that spawn a separate thread to perform the polling in.
+The generator will then be resumed on that thread.</p>
+</div>
+<div class="section" id="subgenerators">
+<h3><a class="toc-backref" href="#id9">Subgenerators</a><a class="headerlink" href="#subgenerators" title="Permalink to this headline">¶</a></h3>
+<p>You can embed subgenerators into the send_self-decorated function.
+The returned value of the subgenerator
+will become the value of the <code class="docutils literal notranslate"><span class="pre">yield</span> <span class="pre">from</span></code> expression.
+See the <a class="reference external" href="https://docs.python.org/3/reference/expressions.html#yield-expressions">Python documentation for yield expressions</a> for more details.</p>
+<p>When embedding functions that have been decorated with <a class="reference internal" href="reference.html#resumeback.send_self" title="resumeback.send_self"><code class="xref py py-func docutils literal notranslate"><span class="pre">send_self()</span></code></a> already,
+you can access its <a class="reference internal" href="reference.html#resumeback.send_self.func" title="resumeback.send_self.func"><code class="xref py py-attr docutils literal notranslate"><span class="pre">func</span></code></a> attribute
+to obtain the wrapped generator function.
+Make sure to provide the wrapper as the first parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_number</span><span class="p">(</span><span class="n">this</span><span class="p">):</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">ask_for_user_input</span><span class="p">(</span><span class="s2">&quot;Please enter a number&quot;</span><span class="p">,</span> <span class="n">this</span><span class="o">.</span><span class="n">send</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">number</span>
+
+<span class="nd">@send_self</span>
+<span class="k">def</span> <span class="nf">print_num</span><span class="p">(</span><span class="n">this</span><span class="p">):</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">get_number</span><span class="p">(</span><span class="n">this</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">number</span>  <span class="c1"># allows caller to retrieve this value</span>
+
+<span class="nd">@send_self</span>
+<span class="k">def</span> <span class="nf">print_plus_10</span><span class="p">(</span><span class="n">this</span><span class="p">):</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">print_num</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">this</span><span class="p">)</span>
+    <span class="n">number</span> <span class="o">+=</span> <span class="mi">10</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">number</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 
@@ -188,49 +261,53 @@ This is but an optimization.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table Of Contents</a></h3>
+  <h3><a href="#">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Introduction</a><ul>
 <li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#usage">Usage</a></li>
-<li><a class="reference internal" href="#how-it-works">How it works</a></li>
-<li><a class="reference internal" href="#code">Code</a></li>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#methods">Methods</a></li>
+<li><a class="reference internal" href="#generators">Generators</a></li>
+<li><a class="reference internal" href="#the-generator-wrapper">The Generator Wrapper</a></li>
+<li><a class="reference internal" href="#preventing-race-conditions">Preventing Race Conditions</a></li>
+<li><a class="reference internal" href="#subgenerators">Subgenerators</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation index</a><ul>
-      <li>Next: <a href="" title="next chapter">Introduction</a></li>
+      <li>Next: <a href="reference.html" title="next chapter">Reference</a></li>
   </ul></li>
 </ul>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/index.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2015, FichteFoll.
-    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    &copy; Copyright 2015-2020, FichteFoll.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
   </div>
   
   </div>
