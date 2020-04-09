@@ -372,9 +372,6 @@ class send_self:  # noqa: N801
 
     def __get__(self, obj, typeobj=None):
         # Proxy descriptor access for {static,class,}methods
-        if not (self.func and hasattr(self.func, '__get__')):
-            return super().__get__(self, obj, typeobj)
-
         new_func = self.func.__get__(obj, typeobj)
         return self.__class__(
             func=new_func,
