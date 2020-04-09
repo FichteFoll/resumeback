@@ -173,11 +173,11 @@ def test_parameter():
         (ValueError, lambda x: x ** 2, [], {}),
         (ValueError, type, [], {}),
         (TypeError, False, [], {}),
+        (TypeError, None, [1], {}),
+        (TypeError, None, ["str"], {}),
         # too many args
         (TypeError, None, [type, 1], {}),
         # send_self args
-        (TypeError, None, [1], {}),
-        (TypeError, None, ["str"], {}),
         (TypeError, None, [], {'catch_stopiteration': 1}),
         (TypeError, None, [], {'finalize_callback': 1}),
         (TypeError, None, [], {'finalize_callback': False}),
