@@ -45,8 +45,7 @@ def test_with_weak_ref():
     # for either of the constructors.
     # However, even then they compare equal.
     @send_self(finalize_callback=print)
-    def func():
-        this = yield
+    def func(this):
         thises = [
             this,
             this.with_weak_ref(),
@@ -63,6 +62,8 @@ def test_with_weak_ref():
             assert comp_ref.weak_generator is not that.weak_generator
             assert comp_ref.weak_generator == that.weak_generator
         ts.run = True
+        if False:  # Turn into a generator function
+            yield
 
     func()
     assert ts.run
@@ -73,8 +74,7 @@ def test_with_strong_ref():
 
     # See test_with_weak_ref
     @send_self(finalize_callback=print)
-    def func():
-        this = yield
+    def func(this):
         this_strong = this.with_strong_ref()
         thises = [
             this_strong,
@@ -94,30 +94,35 @@ def test_with_strong_ref():
         del thises
         del comp_ref
         ts.run = True
+        if False:  # Turn into a generator function
+            yield
 
     func()
+    assert ts.run
+
+
+def test_has_terminated_simple():
+    ts = State()
+
+    @send_self
+    def func(_):
+        ts.run = True
+        if False:  # Turn into a generator function
+            yield
+
+    assert func().has_terminated()
     assert ts.run
 
 
 def test_has_terminated():
     ts = State()
 
-    @send_self
-    def func():
-        yield
-        ts.run = True
-
-    assert func().has_terminated()
-    assert ts.run
-    ts.reset()
-
     def cb(this):
         assert not this.has_terminated()
         this.send_wait(True)
 
     @send_self
-    def func2():
-        this = yield
+    def func2(this):
         assert not this.has_terminated()
 
         ts.run = yield defer(cb, this, sleep=0)

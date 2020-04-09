@@ -13,8 +13,7 @@ def test_subgenerator_next():
         ts.run = True
 
     @send_self
-    def func():
-        this = yield
+    def func(this):
         yield from subgenerator(this)
 
     wrapper = func()
@@ -31,8 +30,7 @@ def test_subgenerator_send():
         ts.run = True
 
     @send_self
-    def func():
-        this = yield
+    def func(this):
         yield from subgenerator(this)
 
     wrapper = func()
@@ -49,8 +47,7 @@ def test_subgenerator_throw():
         ts.run = True
 
     @send_self
-    def func():
-        this = yield
+    def func(this):
         yield from subgenerator(this)
 
     wrapper = func()

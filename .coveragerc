@@ -9,3 +9,6 @@ exclude_lines =
 
   # This line is only ever used to make tests fail
   ts\.run = False
+
+  # Used to create generator functions
+  if False:

@@ -12,9 +12,10 @@ def test_normal_termination():
     ts = State()
 
     @send_self
-    def func():
-        yield
+    def func(_):
         ts.run = True
+        if False:  # Turn into a generator function
+            yield
 
     wrapper = func().with_weak_ref()
     assert ts.run
@@ -25,8 +26,7 @@ def test_deferred_termination():
     ts = State()
 
     @send_self
-    def func():
-        this = yield
+    def func(this):
         yield defer(this.next)
         ts.run = True
 
@@ -40,8 +40,7 @@ def test_weakref_suspended():
     ts = State()
 
     @send_self
-    def func():
-        yield
+    def func(_):
         ts.run = True
         yield
         ts.run = False
@@ -55,8 +54,7 @@ def test_weakref_suspended_deferred():
     ts = State()
 
     @send_self
-    def func():
-        this = yield
+    def func(this):
         ts.run = True
         yield defer(this.next, call=False)
         ts.run = False
@@ -71,8 +69,7 @@ def test_strongref_suspended():
     ts = State()
 
     @send_self
-    def func():
-        yield
+    def func(_):
         ts.run = True
         yield
         ts.run = False
@@ -95,8 +92,7 @@ def test_strongref_suspended_deferred():
     ts = State()
 
     @send_self
-    def func():
-        this = yield
+    def func(this):
         ts.run = True
         yield defer(this.next, call=False)
         ts.run = False
@@ -116,8 +112,8 @@ def test_circular_strongref_suspended():
     ts = State()
 
     @send_self
-    def func():
-        this = (yield)()  # NOQA - needed for a circular reference
+    def func(this):
+        this = this()
         ts.run = True
         yield
         ts.run = False

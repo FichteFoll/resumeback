@@ -2,7 +2,6 @@ import pytest
 
 from resumeback import (
     send_self,
-    send_self_return,
     WeakGeneratorWrapper,
     StrongGeneratorWrapper
 )
@@ -15,10 +14,10 @@ def test_wrapper_type():
     ts = State()
 
     @send_self
-    def func():
-        this = yield
+    def func(this):
         assert type(this) is WeakGeneratorWrapper
         ts.run = True
+        yield
 
     assert type(func() is StrongGeneratorWrapper)
     assert ts.run
@@ -28,11 +27,14 @@ def test_send_self_return():
     ts = State()
     val = 123 + random()
 
-    @send_self_return
     def func():
-        this = yield val
-        assert type(this) is WeakGeneratorWrapper
-        ts.run = True
+        @send_self
+        def internal(this):
+            assert type(this) is WeakGeneratorWrapper
+            ts.run = True
+            yield
+        internal()
+        return val
 
     assert func() == val
     assert ts.run
@@ -46,9 +48,7 @@ def test_wrapping():
     attributes = ["__%s__" % a
                   for a in 'doc,name,module,annotations'.split(',')]
 
-    for deco in [send_self, send_self_return,
-                 send_self(catch_stopiteration=True),
-                 send_self_return(catch_stopiteration=True)]:
+    for deco in [send_self, send_self(catch_stopiteration=True)]:
         wrapped = deco(func)
         for attr in attributes:
             if hasattr(wrapped, attr):
@@ -60,8 +60,7 @@ def test_wrapping():
 
 def test_not_catch_stopiteration():
     @send_self(catch_stopiteration=False)
-    def func():
-        yield
+    def func(_):
         try:
             yield
         except CustomError:
@@ -76,28 +75,27 @@ def test_not_catch_stopiteration():
             getattr(w, meth)(*args)
 
 
-def test_not_catch_stopiteration_value():
-    val = random() + 100
+@pytest.mark.parametrize(
+    'method, args, value',
+    [
+        ('next', [], None),
+        ('send', ["abc"], "abc"),
+        ('throw', [CustomError, True], True),
+    ]
+)
+def test_not_catch_stopiteration_value(method, args, value):
 
-    @send_self(catch_stopiteration=False)
-    def func():
-        yield
+    @send_self(catch_stopiteration=False, debug=True)
+    def func(_):
         try:
-            yield
-        except CustomError:
-            pass
-        return val  # Raises StopIteration here
+            return (yield)
+        except CustomError as e:
+            return e.args[0]
 
-    for meth, args in [('next',  []),
-                       ('send',  [val + 1]),
-                       ('throw', [CustomError])]:
-        w = func()
-        try:
-            getattr(w, meth)(*args)
-        except StopIteration as si:
-            assert si.value == val
-        else:
-            pytest.fail("Did not raise")
+    w = func()
+    with pytest.raises(StopIteration) as exc:
+        getattr(w, method)(*args)
+    assert exc.value.value == value
 
 
 def test_finalize_callback():
@@ -111,11 +109,12 @@ def test_finalize_callback():
         ts.called += 1
 
     @send_self(finalize_callback=cb)
-    def func():
-        this = yield
+    def func(this):
         ts.wref = this.weak_generator
         ts.called += 1
         # Now, terminate and let gc do its work
+        if False:  # Turn into a generator function
+            yield
 
     func()
     assert ts.called == 2
@@ -123,7 +122,7 @@ def test_finalize_callback():
 
 def test_cleanup_return():
     @send_self
-    def func():
+    def func(_):
         yield
         # implicit return
 
@@ -133,22 +132,11 @@ def test_cleanup_return():
 
 def test_cleanup_yield():
     @send_self
-    def func():
-        yield
+    def func(_):
         yield
 
     ref = func().weak_generator
     assert ref() is None
-
-
-def test_yield_return():
-    val = ("const", random())
-
-    @send_self_return
-    def func():
-        yield val
-
-    assert val == func()
 
 
 def test_parameter():
@@ -156,10 +144,11 @@ def test_parameter():
     val = ("const", random())
 
     @send_self
-    def func(param):
-        yield
+    def func(_, param):
         assert param == val
         ts.run = True
+        if False:  # Turn into a generator function
+            yield
 
     func(val)
     assert ts.run

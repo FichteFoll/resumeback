@@ -8,8 +8,7 @@ from . import defer, wait_until_finished, State
 def test_method():
     class A:
         @send_self
-        def method(self, param):
-            this = yield
+        def method(self, this, param):
             yield defer(this.next)
             assert self.__class__ is A
             self.param = param
@@ -25,8 +24,7 @@ def test_classmethod():
     class B:
         @classmethod
         @send_self
-        def clsmethod(cls, param):
-            this = yield
+        def clsmethod(this, cls, param):
             yield defer(this.next)
             assert cls is B
             ts.run = param
@@ -42,8 +40,7 @@ def test_staticmethod():
     class C:
         @staticmethod
         @send_self
-        def stcmethod(param):
-            this = yield
+        def stcmethod(this, param):
             yield defer(this.next)
             ts.run = param
 
@@ -57,7 +54,7 @@ def test_classmethod_wrong_order():
         class C:
             @send_self
             @classmethod
-            def clsmethod(param):
+            def clsmethod(_, cls, param):
                 yield
 
 
@@ -66,5 +63,5 @@ def test_staticmethod_wrong_order():
         class C:
             @send_self
             @staticmethod
-            def stcmethod(param):
+            def stcmethod(_, param):
                 yield
