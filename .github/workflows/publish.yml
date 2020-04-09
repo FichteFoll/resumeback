@@ -1,0 +1,40 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+env:
+  POETRY_VERSION: 1.0.5
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Fetch release assets
+        env:
+          EVENT_PATH: ${{ github.event_path }}
+        shell: bash
+        run: |
+          mkdir dist/
+          cd dist
+          jq -r ".release.assets[].browser_download_url" "$EVENT_PATH" \
+            | wget -i -
+          [[ -e $(command ls -A) ]]  # fail if directory empty
+
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.x
+
+      - name: Install poetry
+        uses: dschep/install-poetry-action@v1.3
+        with:
+          version: ${{ env.POETRY_VERSION }}
+
+      - name: Publish on PyPI
+        run: poetry publish
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}

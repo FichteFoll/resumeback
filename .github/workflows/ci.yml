@@ -68,3 +68,43 @@ jobs:
         run: |
           pip install coveralls
           coveralls
+
+  build:
+    needs: [tests, flake8]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.x
+
+      - name: Install poetry
+        uses: dschep/install-poetry-action@v1.3
+        with:
+          version: ${{ env.POETRY_VERSION }}
+
+      - name: Build
+        run: poetry build
+
+      # I would prefer to do this as a separate conditional job,
+      # but uploading and downloading artifacts with dynamic file names is a pain.
+      - name: Set release metadata
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+        id: meta
+        shell: bash
+        run: |
+          echo "::set-output date=$(TZ=CET date -Idate)"
+
+      - name: Draft release
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: ${{ github.ref }} (${{ steps.meta.outputs.date }})
+          body: TODO
+          files: dist/*
+          draft: true
+          prerelease: false
