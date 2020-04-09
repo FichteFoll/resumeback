@@ -1,0 +1,66 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+  POETRY_VERSION: 1.0.5
+  POETRYINSTALLOPTS: -v
+  FLAKE8OPTS: -v
+  PYTESTOPTS: -v
+
+jobs:
+  flake8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.x
+
+      - uses: dschep/install-poetry-action@v1.3
+        with:
+          version: 1.0.5
+
+      # Skip cache because we have few deps
+      - name: Install and run flake8
+        run: make -e flake8
+
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.5', '3.6', '3.7', '3.8']
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: dschep/install-poetry-action@v1.3
+        with:
+          version: 1.0.5
+          create_virtualenvs: true
+
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v1
+        id: cache
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: poetry-tests-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install test dependencies
+        run: make -e test_env
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      - name: Run tests
+        run: make -e coverage
+
+      - name: Coveralls
+        continue-on-error: true
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        run: |
+          pip install coveralls
+          coveralls
