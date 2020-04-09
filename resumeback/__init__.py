@@ -303,7 +303,10 @@ class send_self:  # noqa: N801
 
     # __slots__ = ['func', 'catch_stopiteration', 'finalize_callback', 'debug']
 
-    def __init__(self, func=None, *, catch_stopiteration=True, finalize_callback=None, debug=False):
+    def __init__(self, func=None, *,
+                 catch_stopiteration=True,
+                 finalize_callback=None,
+                 debug=False):
         # Typechecking
         if func is not None:
             self._validate_func(func)

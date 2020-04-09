@@ -47,7 +47,7 @@ def test_wrapping():
                   for a in 'doc,name,module,annotations'.split(',')]
 
     for deco in [send_self, send_self_return,
-                 send_self(catch_stopiteration=True), 
+                 send_self(catch_stopiteration=True),
                  send_self_return(catch_stopiteration=True)]:
         wrapped = deco(func)
         for attr in attributes:
