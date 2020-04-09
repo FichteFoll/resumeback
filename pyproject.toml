@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "resumeback"
-version = "0.2.0-dev"
+version = "1.0.0"
 description = "Library for using callbacks to resume your code."
 authors = ["FichteFoll <fichtefoll2@googlemail.com>"]
 license = "MIT"
