@@ -185,7 +185,7 @@ def test_parameter():
         # "delayed" func
         (TypeError, type, [], {'catch_stopiteration': 1}),
         (ValueError, type, [], {'catch_stopiteration': True}),
-        (RuntimeError, 1, [], {'catch_stopiteration': True}),
+        (TypeError, 1, [], {'catch_stopiteration': True}),
     ]
 )
 def test_bad_arguments(error, func, args, kwargs):

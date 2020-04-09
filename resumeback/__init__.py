@@ -360,15 +360,14 @@ class send_self:  # noqa: N801
         return gen_wrapper
 
     def __call__(self, *args, **kwargs):
-        # Second part of decorator usage, i.e. `@send_self(True) \n def ...`
+        # Second part of decorator usage, i.e. `@send_self() \n def ...`
         if not self.func:
-            if not args or not callable(args[0]):
+            if not args:
                 raise RuntimeError("send_self wrapper has not properly been initialized yet")
-            else:
-                self._validate_func(args[0])
-                self.func = args[0]
-                update_wrapper(self, self.func)
-                return self
+            self._validate_func(args[0])
+            self.func = args[0]
+            update_wrapper(self, self.func)
+            return self
 
         # Create generator
         generator = self.func(*args, **kwargs)
