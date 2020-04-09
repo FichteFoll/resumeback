@@ -1,4 +1,4 @@
-name: Publish
+name: Publish on PyPI
 
 on:
   release:
@@ -8,7 +8,7 @@ env:
   POETRY_VERSION: 1.0.5
 
 jobs:
-  deploy:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,7 +22,6 @@ jobs:
           cd dist
           jq -r ".release.assets[].browser_download_url" "$EVENT_PATH" \
             | wget -i -
-          [[ -e $(command ls -A) ]]  # fail if directory empty
 
       - name: Setup Python
         uses: actions/setup-python@v1
