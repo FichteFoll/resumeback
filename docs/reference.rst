@@ -89,7 +89,7 @@
       If the callable is not a generator function.
 
 
-   .. attribute:: func
+   .. attribute:: send_self.func
 
       The wrapped generator function.
 

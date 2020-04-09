@@ -30,8 +30,8 @@ import datetime
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.coverage',
+    # 'sphinx.ext.autodoc',
+    # 'sphinx.ext.coverage',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -51,7 +51,7 @@ project = 'resumeback'
 copyright = f'2015-{datetime.datetime.now().year}, FichteFoll'
 
 # Load version from source
-sys.path.insert(0, os.path.abspath('./../..'))  # autodoc
+sys.path.insert(0, os.path.abspath('./..'))
 import resumeback
 version = resumeback.__version__
 
