@@ -5,6 +5,9 @@
 .. currentmodule:: resumeback
 
 
+.. contents::
+
+
 ``resume_back`` module
 ======================
 
@@ -15,25 +18,20 @@
 
    __ http://semver.org
 
-.. attribute:: version_info
-
-   A tuple containing the :attr:`__version__` in (major, minor, patch) format.
-
 
 ``@send_self`` decorator
 ========================
 
 
 .. decorator:: send_self
-.. decorator:: send_self(catch_stopiteration=True, finalize_callback=None, debug=False)
+.. decorator:: send_self(*, catch_stopiteration=True, finalize_callback=None, debug=False)
 
-   Decorator that sends a "generator function" a wrapper of itself.
+   Decorator that sends a "generator function" a wrapper of its instance.
 
    Can be called with parameters or used as a decorator directly.
 
    When a generator decorated by this is called,
-   it gets sent a wrapper of itself
-   via the first 'yield' used.
+   it receives a wrapper of its instance as the first parameter.
    The wrapper is an instance of :class:`WeakGeneratorWrapper`.
    The function then returns said wrapper.
 
@@ -42,11 +40,14 @@
    in a linear style,
    by passing the wrapper or one of its method properties
    as callback parameters
-   and then pausing itself with 'yield'.
+   and then pausing itself with ``yield``.
 
-   For usage with :func:`classmethod` or :func:`staticmetod`,
+   For usage with :func:`classmethod` or :func:`staticmethod`,
    use :func:`~resumeback.send_self` first and wrap it with the
    ``*method`` decorator.
+
+   All provided arguments are stored as attributes
+   and may be modified before called.
 
    .. note::
 
@@ -88,17 +89,9 @@
       If the callable is not a generator function.
 
 
-.. decorator:: send_self_return
-.. decorator:: send_self_return(catch_stopiteration=True, finalize_callback=None, debug=False)
+   .. attribute:: func
 
-   Decorator that sends a "generator function" a wrapper of itself.
-
-   Behaves exactly like :func:`send_self`,
-   except that it returns the first yielded value
-   of the generator instead of a wrapper to it.
-
-   :return:
-      The first yielded value of the generator.
+      The wrapped generator function.
 
 
 Wrappers
@@ -228,8 +221,8 @@ Wrappers
       Create a waiting daemon thread to resume the generator.
 
       Works like :meth:`next_wait`
-      but does it asynchronously.
-      The thread spawned raises :class:`WaitTimeoutError`
+      but does so asynchronously.
+      The spawned thread raises :exc:`WaitTimeoutError`
       when it times out.
 
       :rtype: threading.Thread
@@ -288,8 +281,8 @@ Wrappers
       Create a waiting daemon thread to send a value to the generator.
 
       Works like :meth:`send_wait`
-      but does it asynchronously.
-      The thread spawned raises :class:`WaitTimeoutError`
+      but does so asynchronously.
+      The spawned thread raises :exc:`WaitTimeoutError`
       when it times out.
 
       :rtype: threading.Thread
@@ -347,8 +340,8 @@ Wrappers
       Create a waiting daemon thread to throw a value to the generator.
 
       Works like :meth:`throw_wait`
-      but does it asynchronously.
-      The thread spawned raises :class:`WaitTimeoutError`
+      but does so asynchronously.
+      The spawned thread raises :exc:`WaitTimeoutError`
       when it times out.
 
       :rtype: threading.Thread

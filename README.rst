@@ -24,7 +24,10 @@ that enables using callback-based interfaces
 in **a single line of execution**
 -- a single function.
 
-Full docs are available here: https://fichtefoll.github.io/resumeback/
+Documentation
+=============
+
+https://fichtefoll.github.io/resumeback/
 
 
 Installation
@@ -35,92 +38,51 @@ Installation
     $ pip install resumeback
 
 
-Usage
-=====
-
-:func:`resumeback.send_self`'s mechanic of sending a generator function
-a handle to itself
-is what allows for better flow control
-using callback-based interfaces.
-Essentially, it enables *a single line of execution*.
-
-Following is a function that uses an asynchronous callback mechanism
-to signal that user input has been made:
+Example Usage
+=============
 
 .. code-block:: python
 
-   from threading import Thread
+    from threading import Thread
+    from resumeback import send_self
 
-   def ask_for_user_input(question, on_done):
-       def watcher():
-           result = input(question)
-           on_done(result)
+    def ask_for_user_input(question, on_done):
+        def watcher():
+            result = input(question)
+            on_done(result)
 
-       Thread(target=watcher).start()
+        Thread(target=watcher).start()
 
-The *traditional* way of using a function like ``ask_for_user_input`` would be
-to define a function of some way,
-either as a closure or using :func:`functools.partial` so that we can preserve
-the state we already accumulated prior to executing said function.
+    @send_self
+    def main(this):  # "this" is a reference to the created generator instance
+        arbitrary_value = 10
 
-For example like so:
+        # Yield pauses execution until one of the generator methods is called,
+        # such as `.send`, which we provide as the callback parameter.
+        number = yield ask_for_user_input("Please enter a number", this.send)
+        number = int(number)
+        print("Result:", number * arbitrary_value)
 
-.. code-block:: python
-
-   def main():
-       arbitrary_value = 10
-
-       def on_done(number):
-           number = str(number)
-           print("Result:", number * arbitrary_value)
-
-       ask_for_user_input("Please enter a number", on_done)
-
-Because Python does not have multi-line inline functions,
-this is rather awkward,
-because we are jumping from the function call of ``ask_for_user_input``
-back to our previously defined function ``on_done``
--- which is only ever going to be called once in this context.
-
-However, using :func:`resumeback.send_self`,
-we can do something to *flatten our line of execution*
-by passing a callback to resume execution in our original function:
-
-.. code-block:: python
-
-   from resumeback import send_self
-
-   @send_self
-   def main():
-       this = yield  # "this" is now a reference to the just-created generator
-       arbitrary_value = 10
-
-       # Yield pauses execution until one of the generator methods is called,
-       # such as `.send`, which we provide as the callback parameter.
-       number = yield ask_for_user_input("Please enter a number", this.send)
-       number = str(number)
-       print("Result:", number * arbitrary_value)
+    if __name__ == "__main__":
+        main()
 
 
-Methods
--------
+Development
+===========
 
-The :func:`resumeback.send_self` decorator can be used on methods,
-classmethods and staticmethods as well.
-For methods, they behave as you would expect.
-For class- or staticmethods, you must ensure
-that you put the method decorator *above* :func:`~resumeback.send_self`.
+Requires Python, poetry, and GNU Make.
 
-.. code-block:: python
+Use ``make help`` to show the available targets.
 
-   from resumeback import send_self
+- poetry__ is used for dependency and virtualenv management.
+- tox__ is used as a test runner for multiple isolated environments.
+- flake8__ is used for code linting.
+- `Github Actions`__ are used for CI.
 
-   class Class:
-       @classmethod
-       @send_self
-       def method(cls):
-           this = yield  # "this" is now a reference to the just-created generator
-           # do things with `cls`
+__ https://python-poetry.org/
+__ https://tox.readthedocs.io/
+__ https://flake8.readthedocs.io/
+__ https://github.com/features/actions
 
 
 Acknowledgements
@@ -131,5 +93,5 @@ on the Sublime Text forum.
 I just took his idea "to the next (abstraction) level"
 and made it more convenient to use.
 
-__ http://www.sublimetext.com/forum/viewtopic.php?f=6&t=17671
+__ https://forum.sublimetext.com/t/using-generators-for-fun-and-profit-utility-for-developers/14618
 __ https://github.com/Varriount
