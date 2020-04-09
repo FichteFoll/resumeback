@@ -88,14 +88,14 @@ jobs:
       - name: Build
         run: poetry build
 
-      # I would prefer to do this as a separate conditional job,
+      # I would prefer to do the following as a separate conditional job,
       # but uploading and downloading artifacts with dynamic file names is a pain.
-      - name: Set release metadata
+      - name: Build release metadata
         if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
         id: meta
         shell: bash
         run: |
-          echo "::set-output date=$(TZ=CET date -Idate)"
+          echo "::set-output name=release_name::${GITHUB_REF##*/} ($(TZ=CET date -Idate))"
 
       - name: Draft release
         if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
@@ -103,7 +103,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: ${{ github.ref }} (${{ steps.meta.outputs.date }})
+          name: ${{ steps.meta.outputs.release_name }}
           body: TODO
           files: dist/*
           draft: true
