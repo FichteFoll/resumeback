@@ -79,7 +79,7 @@ dist:
 	$(POETRY) build
 
 # target: publish - Upload dist/ to pypi.
-publish: dist/resumeback-*.zip dist/resumeback-*.whl
+publish: dist/resumeback-*.gz dist/resumeback-*.whl
 	$(POETRY) publish
 	touch publish
 
