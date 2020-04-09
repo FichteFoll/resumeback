@@ -12,13 +12,15 @@ jobs:
   flake8:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
-      - uses: actions/setup-python@v1
+      - name: Setup Python
+        uses: actions/setup-python@v1
         with:
           python-version: 3.x
 
-      - uses: dschep/install-poetry-action@v1.3
+      - name: Install poetry
+        uses: dschep/install-poetry-action@v1.3
         with:
           version: 1.0.5
 
@@ -32,18 +34,20 @@ jobs:
       matrix:
         python-version: ['3.5', '3.6', '3.7', '3.8']
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
-      - uses: actions/setup-python@v1
+      - name: Setup Python
+        uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: dschep/install-poetry-action@v1.3
+      - name: Install poetry
+        uses: dschep/install-poetry-action@v1.3
         with:
           version: ${{ env.POETRY_VERSION }}
           create_virtualenvs: true
 
-      - name: Cache Poetry virtualenv
+      - name: Cache poetry virtualenv
         uses: actions/cache@v1
         id: cache
         with:
