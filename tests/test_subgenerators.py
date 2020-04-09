@@ -53,3 +53,21 @@ def test_subgenerator_throw():
     wrapper = func()
     wait_until_finished(wrapper)
     assert ts.run
+
+
+def test_subgenerator_repurpose():
+    ts = State()
+    val = 1234
+
+    @send_self
+    def func2(this):
+        assert (yield defer(this.send, val)) == val
+        ts.run = True
+
+    @send_self
+    def func(this):
+        yield from func2.func(this)
+
+    wrapper = func()
+    wait_until_finished(wrapper)
+    assert ts.run
