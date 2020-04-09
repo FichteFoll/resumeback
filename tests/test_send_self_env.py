@@ -169,9 +169,9 @@ def test_parameter():
     'error, func, args, kwargs',
     [
         # "func" arg
-        (TypeError, test_parameter, [], {}),
-        (TypeError, lambda x: x ** 2, [], {}),
-        (TypeError, type, [], {}),
+        (ValueError, test_parameter, [], {}),
+        (ValueError, lambda x: x ** 2, [], {}),
+        (ValueError, type, [], {}),
         (TypeError, False, [], {}),
         # too many args
         (TypeError, None, [type, 1], {}),

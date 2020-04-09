@@ -44,6 +44,10 @@
    as callback parameters
    and then pausing itself with 'yield'.
 
+   For usage with :func:`classmethod` or :func:`staticmetod`,
+   use :func:`~resumeback.send_self` first and wrap it with the
+   ``*method`` decorator.
+
    .. note::
 
       Binding a strong reference to the generator

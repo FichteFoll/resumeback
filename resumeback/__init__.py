@@ -301,30 +301,43 @@ class send_self:  # noqa: N801
     Can be called with parameters or used as a decorator directly.
     """
 
+    # __slots__ = ['func', 'catch_stopiteration', 'finalize_callback', 'debug']
+
     def __init__(self, func=None, *, catch_stopiteration=True, finalize_callback=None, debug=False):
         # Typechecking
+        if func is not None:
+            self._validate_func(func)
+
         type_table = [
             ('catch_stopiteration', bool),
             ('debug', bool),
             ('finalize_callback', (Callable, type(None)))
         ]
-        if func is not None and not inspect.isgeneratorfunction(func):
-            raise TypeError("Callable must be a generatorfunction")
-
         for name, type_ in type_table:
             val = locals()[name]
             if not isinstance(val, type_):
                 raise TypeError("Expected %s for parameter '%s', got %s"
                                 % (type_, name, type(val)))
 
+        self.func = func
         self.catch_stopiteration = catch_stopiteration
         self.finalize_callback = finalize_callback
         self.debug = debug
-        self.func = func
 
         # Wrap func if it was specified
         if func:
             update_wrapper(self, func)
+
+    def _validate_func(self, func):
+        # TODO find out if wrapped *method is a generatorfunc
+        if isinstance(func, staticmethod):
+            raise ValueError("Cannot wrap staticmethod - try reversing wrap order")
+        elif isinstance(func, classmethod):
+            raise ValueError("Cannot wrap classmethod - try reversing wrap order")
+        elif not callable(func):
+            raise TypeError("Decorator must wrap a callable")
+        elif not inspect.isgeneratorfunction(func):
+            raise ValueError("Callable must be a generator function")
 
     def _start_generator(self, generator):
         # Start generator
@@ -349,8 +362,7 @@ class send_self:  # noqa: N801
             if not args or not callable(args[0]):
                 raise RuntimeError("send_self wrapper has not properly been initialized yet")
             else:
-                if not inspect.isgeneratorfunction(args[0]):
-                    raise ValueError("Callable must be a generatorfunction")
+                self._validate_func(args[0])
                 self.func = args[0]
                 update_wrapper(self, self.func)
                 return self
@@ -359,6 +371,19 @@ class send_self:  # noqa: N801
         generator = self.func(*args, **kwargs)
 
         return self._start_generator(generator)
+
+    def __get__(self, obj, typeobj=None):
+        # Proxy descriptor access for {static,class,}methods
+        if not (self.func and hasattr(self.func, '__get__')):
+            return super().__get__(self, obj, typeobj)
+
+        new_func = self.func.__get__(obj, typeobj)
+        return self.__class__(
+            func=new_func,
+            catch_stopiteration=self.catch_stopiteration,
+            finalize_callback=self.finalize_callback,
+            debug=self.debug,
+        )
 
 
 class send_self_return(send_self):  # noqa: N801

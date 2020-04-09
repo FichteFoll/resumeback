@@ -102,6 +102,27 @@ by passing a callback to resume execution in our original function:
        print("Result:", number * arbitrary_value)
 
 
+Methods
+-------
+
+The :func:`resumeback.send_self` decorator can be used on methods,
+classmethods and staticmethods as well.
+For methods, they behave as you would expect.
+For class- or staticmethods, you must ensure
+that you put the method decorator *above* :func:`~resumeback.send_self`.
+
+.. code-block:: python
+
+   from resumeback import send_self
+
+   class Class:
+       @classmethod
+       @send_self
+       def method(cls):
+           this = yield  # "this" is now a reference to the just-created generator
+           # do things with `cls`
+
+
 Acknowledgements
 ================
 
