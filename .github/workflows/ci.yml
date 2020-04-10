@@ -70,7 +70,6 @@ jobs:
           coveralls
 
   build:
-    needs: [tests, flake8]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -88,17 +87,30 @@ jobs:
       - name: Build
         run: poetry build
 
-      # I would prefer to do the following as a separate conditional job,
-      # but uploading and downloading artifacts with dynamic file names is a pain.
-      - name: Build release metadata
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: dist
+          path: dist
+
+  draft_release:
+    needs: [build, tests, flake8]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+    steps:
+      - name: Fetch build artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: dist
+          path: dist
+
+      - name: Set release metadata
         id: meta
         shell: bash
         run: |
           echo "::set-output name=release_name::${GITHUB_REF##*/} ($(TZ=CET date -Idate))"
 
-      - name: Draft release
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+      - name: Create release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
