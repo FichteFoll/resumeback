@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request]
 
 env:
-  POETRY_VERSION: 1.0.5
+  POETRY_VERSION: 1.1.6
   POETRYINSTALLOPTS: -v
   FLAKE8OPTS: -v
   PYTESTOPTS: -v
@@ -20,9 +20,10 @@ jobs:
           python-version: 3.x
 
       - name: Install poetry
-        uses: dschep/install-poetry-action@v1.3
+        uses: snok/install-poetry@v1.1.4
         with:
-          version: 1.0.5
+          version: ${{ env.POETRY_VERSION }}
+          virtualenvs-create: false
 
       # Skip cache because we have few deps
       - name: Install and run flake8
@@ -42,10 +43,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install poetry
-        uses: dschep/install-poetry-action@v1.3
+        uses: snok/install-poetry@v1.1.4
         with:
           version: ${{ env.POETRY_VERSION }}
-          create_virtualenvs: true
 
       - name: Cache poetry virtualenv
         uses: actions/cache@v1
@@ -80,9 +80,10 @@ jobs:
           python-version: 3.x
 
       - name: Install poetry
-        uses: dschep/install-poetry-action@v1.3
+        uses: snok/install-poetry@v1.1.4
         with:
           version: ${{ env.POETRY_VERSION }}
+          virtualenvs-create: false
 
       - name: Build
         run: poetry build
