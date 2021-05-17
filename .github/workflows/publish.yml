@@ -29,9 +29,10 @@ jobs:
           python-version: 3.x
 
       - name: Install poetry
-        uses: dschep/install-poetry-action@v1.3
+        uses: snok/install-poetry@v1.1.4
         with:
           version: ${{ env.POETRY_VERSION }}
+          virtualenvs-create: false
 
       - name: Publish on PyPI
         run: poetry publish
