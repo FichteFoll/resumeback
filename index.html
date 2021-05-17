@@ -3,7 +3,8 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Introduction &#8212; resumeback  documentation</title>
     <link rel="stylesheet" href="_static/readable.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -42,7 +43,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="introduction">
+  <section id="introduction">
 <h1><a class="toc-backref" href="#id2">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <p>A Python 3 library for using callbacks to resume your code.</p>
 <p><code class="docutils literal notranslate"><span class="pre">resumeback</span></code> provides a utility function decorator
@@ -81,13 +82,13 @@ in <strong>a single line of execution</strong>
 </li>
 </ul>
 </div>
-<div class="section" id="installation">
+<section id="installation">
 <h2><a class="toc-backref" href="#id3">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pip install resumeback
 </pre></div>
 </div>
-</div>
-<div class="section" id="usage">
+</section>
+<section id="usage">
 <h2><a class="toc-backref" href="#id4">Usage</a><a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="reference.html#resumeback.send_self" title="resumeback.send_self"><code class="xref py py-func docutils literal notranslate"><span class="pre">resumeback.send_self()</span></code></a>’s mechanic of providing a generator function
 with a handle to its running instance
@@ -146,7 +147,7 @@ by passing a callback to resume execution in our original function:</p>
 <p>The function decorated by <a class="reference internal" href="reference.html#resumeback.send_self" title="resumeback.send_self"><code class="xref py py-func docutils literal notranslate"><span class="pre">send_self()</span></code></a>
 will be called with the wrapper to the created generator instance
 as the first parameter.</p>
-<div class="section" id="methods">
+<section id="methods">
 <h3><a class="toc-backref" href="#id5">Methods</a><a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
 <p>The <a class="reference internal" href="reference.html#resumeback.send_self" title="resumeback.send_self"><code class="xref py py-func docutils literal notranslate"><span class="pre">send_self()</span></code></a> decorator can be used on methods,
 classmethods and staticmethods as well.
@@ -166,8 +167,8 @@ that you put the method decorator <em>above</em> <a class="reference internal" h
         <span class="k">pass</span>  <span class="c1"># do things with `cls`</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="generators">
+</section>
+<section id="generators">
 <h3><a class="toc-backref" href="#id6">Generators</a><a class="headerlink" href="#generators" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference internal" href="reference.html#resumeback.send_self" title="resumeback.send_self"><code class="xref py py-func docutils literal notranslate"><span class="pre">resumeback.send_self()</span></code></a> operates on generators
 and their possibility of sending arbitrary data to them
@@ -187,8 +188,8 @@ generators in Python provide four methods for interacting with them:</p>
 </ol>
 <p>Note that any remaining <code class="docutils literal notranslate"><span class="pre">finally</span></code> blocks wrapping a paused <code class="docutils literal notranslate"><span class="pre">yield</span></code>
 will be called when the generator is deleted.</p>
-</div>
-<div class="section" id="the-generator-wrapper">
+</section>
+<section id="the-generator-wrapper">
 <h3><a class="toc-backref" href="#id7">The Generator Wrapper</a><a class="headerlink" href="#the-generator-wrapper" title="Permalink to this headline">¶</a></h3>
 <p>Instead of being called with the generator instance directly,
 it is wrapped in a convenience class
@@ -208,8 +209,8 @@ to ensure it does not get cleaned up
 while it waits for that to be called.
 This is but an optimization.
 A strongly referencing wrapper is available on-demand.</p>
-</div>
-<div class="section" id="preventing-race-conditions">
+</section>
+<section id="preventing-race-conditions">
 <h3><a class="toc-backref" href="#id8">Preventing Race Conditions</a><a class="headerlink" href="#preventing-race-conditions" title="Permalink to this headline">¶</a></h3>
 <p>Because threads can be interrupted at any point in a non-atomic operation,
 it is possible that a generator could be attempted to be resumed
@@ -224,8 +225,8 @@ For convenience in these situations,
 the wrapper object provides <code class="docutils literal notranslate"><span class="pre">*_wait_async</span></code> methods
 that spawn a separate thread to perform the polling in.
 The generator will then be resumed on that thread.</p>
-</div>
-<div class="section" id="subgenerators">
+</section>
+<section id="subgenerators">
 <h3><a class="toc-backref" href="#id9">Subgenerators</a><a class="headerlink" href="#subgenerators" title="Permalink to this headline">¶</a></h3>
 <p>You can embed subgenerators into the send_self-decorated function.
 The returned value of the subgenerator
@@ -253,9 +254,9 @@ Make sure to provide the wrapper as the first parameter.</p>
     <span class="k">return</span> <span class="n">number</span>
 </pre></div>
 </div>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
           </div>
@@ -306,7 +307,7 @@ Make sure to provide the wrapper as the first parameter.</p>
       <div class="clearer"></div>
     </div>
   <div class="footer">
-    &copy; Copyright 2015-2020, FichteFoll.
+    &copy; Copyright 2015-2021, FichteFoll.
     Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
   </div>
   
