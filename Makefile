@@ -26,7 +26,6 @@ ALLCOVOPTS = $(PYTESTOPTS) --cov resumeback --cov-config .coveragerc $(COVOPTS)
 ALLSPHINXOPTS = -d $(SPHINX_BUILDDIR)/doctrees $(SPHINXOPTS) $(DOCSOURCEDIR)
 
 
-
 ################################################
 ## targets
 
@@ -78,11 +77,6 @@ dist_clean:
 dist:
 	$(POETRY) build
 
-# target: publish - Upload dist/ to pypi.
-publish: dist/resumeback-*.gz dist/resumeback-*.whl
-	$(POETRY) publish
-	touch publish
-
 
 ## docs ####################
 
@@ -101,8 +95,6 @@ html: $(SPHINX_BUILDDIR)/html
 
 # target: docs - Alias for `html`.
 docs: html
-
-# TODO docsupload target
 
 
 ## test/lint ###############
